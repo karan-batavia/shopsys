@@ -1,4 +1,4 @@
-# Integration (third party applications)
+# Integrations (third party applications)
 
 - [Luigi's Box](./luigis-box.md)
 - [Packeta](./packeta.md)

@@ -12,6 +12,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import 'react-toastify/dist/ReactToastify.css';
 import 'styles/globals.css';
 import 'styles/user-text.css';
+import 'styles/variables.css';
 import { logException } from 'utils/errors/logException';
 import { initDayjsLocale } from 'utils/formaters/formatDate';
 

@@ -6,6 +6,7 @@ namespace Shopsys\FrameworkBundle\Form\Admin\Product;
 
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Shopsys\FormTypesBundle\MultidomainType;
+use Shopsys\FormTypesBundle\SwitchType;
 use Shopsys\FormTypesBundle\YesNoType;
 use Shopsys\FrameworkBundle\Component\Domain\Domain;
 use Shopsys\FrameworkBundle\Component\Plugin\PluginCrudExtensionFacade;
@@ -434,7 +435,7 @@ class ProductFormType extends AbstractType
                 'invalid_message' => 'Enter date in DD.MM.YYYY format',
                 'label' => t('Selling end date'),
             ])
-            ->add('sellingDenied', YesNoType::class, [
+            ->add('sellingDenied', SwitchType::class, [
                 'required' => false,
                 'label' => t('Exclude from sale on whole eshop'),
                 'attr' => [

@@ -40,7 +40,7 @@ class CKEditorRendererDecorator implements CKEditorRendererInterface
      * @return string
      */
     public function renderWidget(string $id, array $config, array $options = []): string
-    {
+    {return '';
         return sprintf(
             '$("#%s-preview").click(function() {
                 %s
@@ -57,7 +57,7 @@ class CKEditorRendererDecorator implements CKEditorRendererInterface
      * @return string
      */
     protected function renderJsValidation(string $id): string
-    {
+    {return '';
         return sprintf(
             'CKEDITOR.instances["%1$s"].on("change", function () {
                 $("#%1$s").jsFormValidator("validate");

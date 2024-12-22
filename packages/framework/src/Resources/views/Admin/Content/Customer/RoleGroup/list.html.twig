@@ -4,11 +4,9 @@
 {% block h1 %}{{ 'Customer user role groups'|trans }}{% endblock %}
 
 {% block btn %}
-    <div class="wrap-bar__buttons">
-        <a href="{{ url('admin_superadmin_customer_user_role_group_new') }}" class="btn btn--primary btn--plus wrap-bar__btn">
-            <i class="btn__icon">+</i>{{ 'Create new customer user role group'|trans }}
-        </a>
-    </div>
+    <a href="{{ url('admin_superadmin_customer_user_role_group_new') }}" class="btn btn-primary d-none d-sm-inline-block">
+        <i class="btn__icon">+</i>{{ 'Create new customer user role group'|trans }}
+    </a>
 {% endblock %}
 
 {% block main_content %}

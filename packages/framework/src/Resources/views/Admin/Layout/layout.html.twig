@@ -1,7 +1,12 @@
 {% extends '@ShopsysFramework/Admin/Layout/base.html.twig' %}
 
 {% block html_body %}
-    {% if isMailerSettingUnusual() %}
+    <div class="page">
+        {% block content %}{% endblock %}
+
+        {% block footer %}{% endblock %}
+    </div>
+    {#  % if isMailerSettingUnusual() %}
         <div class="window-fixed-bar window-fixed-bar--top window-fixed-bar--type-alert">
             <div class="window-fixed-bar__in">
                 <div class="window-fixed-bar__item">
@@ -38,6 +43,6 @@
 
         {% block content %}{% endblock %}
 
-        {% block footer %}{% endblock %}
-    </div>
+        {% block footer %}{% endblock % #}
+
 {% endblock %}

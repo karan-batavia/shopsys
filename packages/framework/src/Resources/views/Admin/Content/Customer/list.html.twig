@@ -4,12 +4,10 @@
 {% block h1 %}{{ 'Customers overview'|trans }}{% endblock %}
 
 {% block btn %}
-    <div class="wrap-bar__buttons">
-        <a href="{{ url('admin_customer_new') }}" class="btn btn--primary btn--plus wrap-bar__btn">
-            <i class="btn__icon">+</i>
-            {{ 'Create new customer'|trans }}
-        </a>
-    </div>
+    <a href="{{ url('admin_customer_new') }}" class="btn btn-primary d-none d-sm-inline-block">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 5l0 14"></path><path d="M5 12l14 0"></path></svg>
+        {{ 'Create new customer'|trans }}
+    </a>
 {% endblock %}
 
 {% block main_content %}
@@ -25,16 +23,16 @@
             <div class="in-tab__content__in active" data-tab-id="quick">
 
                 {{ form_start(quickSearchForm) }}
-                    <div class="box-quick-search">
-                        <div class="box-quick-search__input">
-                            {{ form_widget(quickSearchForm.text) }}
-                            <i class="svg svg-info cursor-help js-tooltip box-quick-search__icon in-icon in-icon--info"
-                               data-toggle="tooltip" data-placement="top"
-                               title="{{ 'Searching searches in last name, company name, email, telephone. It is possible to use wildcards * and ?.'|trans }}"
-                            ></i>
-                        </div>
-                        {{ form_widget(quickSearchForm.submit, { attr: { class : 'box-quick-search__btn' }, label: 'Search [verb]'|trans, full_name: ''}) }}
+                <div class="box-quick-search">
+                    <div class="box-quick-search__input">
+                        {{ form_widget(quickSearchForm.text) }}
+                        <i class="svg svg-info cursor-help js-tooltip box-quick-search__icon in-icon in-icon--info"
+                           data-toggle="tooltip" data-placement="top"
+                           title="{{ 'Searching searches in last name, company name, email, telephone. It is possible to use wildcards * and ?.'|trans }}"
+                        ></i>
                     </div>
+                    {{ form_widget(quickSearchForm.submit, { attr: { class : 'box-quick-search__btn' }, label: 'Search [verb]'|trans, full_name: ''}) }}
+                </div>
                 {{ form_end(quickSearchForm) }}
             </div>
         </div>

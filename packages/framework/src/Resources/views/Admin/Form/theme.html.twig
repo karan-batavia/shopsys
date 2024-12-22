@@ -16,14 +16,14 @@
         {% set form_method = "POST" %}
     {%- endif -%}
     <form name="{{ form.vars.name }}" method="{{ form_method|lower }}" action="{{ action }}"
-        {%- for attrname, attrvalue in attr -%}
-            {{- " " -}}
-            {%- if attrname is same as('multipleForm') -%}
-            {%- else -%}
-                {{- attrname }}="{{ attrvalue }}"
-            {%- endif -%}
-        {%- endfor -%}
-        {% if multipart %} enctype="multipart/form-data"{% endif %}>
+    {%- for attrname, attrvalue in attr -%}
+        {{- " " -}}
+        {%- if attrname is same as('multipleForm') -%}
+        {%- else -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
+    {% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}
@@ -35,7 +35,7 @@
 {% endblock form_end %}
 
 {% block localized_row -%}
-    <div class="form-line">
+    <div class="mb-3">
         {{- form_label(form) -}}
         {{- form_errors(form) -}}
         {{- block('localized_form_rows') -}}
@@ -54,14 +54,15 @@
 
 {% block form_row %}
     {% if render_form_row %}
-        <div class="form-line{% if multidomain is defined and multidomain %} form-line--no-horizontal-gap{% endif %}{{ attr.disabledField is defined ? ' form-input-disabled form-line--disabled' }}">
+        <div class="mb-3{% if multidomain is defined and multidomain %} form-line--no-horizontal-gap{% endif %}{{ attr.disabledField is defined ? ' form-input-disabled form-line--disabled' }}">
         {{ form_errors(form) }}
         {{ form_label(form, label) }}
     {% endif %}
     {{ form_widget(form) }}
     {% if attr.disabledField is defined %}
-        <span class="form-disabled {{ attr.disabledFieldClass|default('') }} js-tooltip" data-toggle="tooltip" data-placement="{{ attr.disabledFieldPlacement|default('right') }}"
-                title="{{ attr.disabledFieldTitle|default('') }}">
+        <span class="form-disabled {{ attr.disabledFieldClass|default('') }} js-tooltip" data-toggle="tooltip"
+              data-placement="{{ attr.disabledFieldPlacement|default('right') }}"
+              title="{{ attr.disabledFieldTitle|default('') }}">
             <i class="svg svg-pencil"></i>
         </span>
     {% endif %}
@@ -75,11 +76,7 @@
     {% for child in form %}
         {{- form_row(child, { localized: true, locale: child.vars.name }) -}}
     {% endfor %}
-    <div class="form-line__side">
-        <div class="form-line__item">
-            {{ self.icon(form.vars.attr) }}
-        </div>
-    </div>
+    {{ self.icon(form.vars.attr) }}
 {%- endblock localized_form_rows %}
 
 {% block multidomain_row -%}
@@ -99,13 +96,13 @@
         {% if form.vars.display_format == 'multidomain_form_rows_no_padding' %}
             <div class="form-line form-line--no-bottom-gap">
                 {% if form.vars.label is not null %}
-                        {{- form_label(form) -}}
-                        {{- form_errors(form) -}}
+                    {{- form_label(form) -}}
+                    {{- form_errors(form) -}}
                 {% endif %}
                 {{- block('multidomain_form_rows_no_padding') -}}
             </div>
         {% else %}
-            <div class="form-line">
+            <div class="mb-3">
                 {{- form_label(form) -}}
                 {{- form_errors(form) -}}
 
@@ -151,7 +148,7 @@
     {% for domainId, child in form %}
         {% if child.vars.attr.show_label is defined %}
             <div class="form-line__line">
-                {{- form_label(child) -}}
+            {{- form_label(child) -}}
         {% endif %}
         {{- form_row(child, { multidomain: true, domainId: domainId }) -}}
         {% if child.vars.attr.show_label is defined %}
@@ -161,7 +158,7 @@
 {%- endblock multidomain_form_rows %}
 
 {% block checkbox_row %}
-    <div class="form-line">
+    <div class="mb-3">
         <div class="form-line__line form-line__line--no-space">
             <div class="form-choice form-choice--inline-checkbox">
                 {{ form_widget(form, { inFormChoice: true }) }}
@@ -178,34 +175,26 @@
 
 {% block text_row -%}
     {% if localized is defined %}
-        <div class="form-line__side form-line__side--multilanguage">
-            <div class="form-line__item">
-                <div class="input__wrap">
-                    {% set inputAttr = attr|merge({'class': (attr.class|default('') ~ ' input--flag')|trim}) %}
-                    {{ form_widget(form, { attr: inputAttr }) }}
-                    <span class="input__flag">
-                        {{ localeFlag(locale) }}
-                    </span>
-                </div>
-            </div>
+        <div class="input-icon mb-3">
+            {% set inputAttr = attr|merge({'class': (attr.class|default('') ~ ' form-control')|trim}) %}
+            <span class="input-icon-addon">
+                {{ localeFlag(locale) }}
+            </span>
+            {{ form_widget(form, { attr: inputAttr }) }}
             {{ form_errors(form) }}
         </div>
     {% elseif multidomain is defined and multidomain %}
-        <div class="form-line__side form-line__side--multidomain">
-            <div class="form-line__item">
-                <div class="input__wrap">
-                    {% set inputAttr = attr %}
-                    {% if isMultidomain() %}
-                        {% set inputAttr = inputAttr|merge({'class': (inputAttr.class|default('') ~ ' input--domain')|trim}) %}
-                    {% endif %}
-                    {{ form_widget(form, { attr: inputAttr }) }}
-                    {% if isMultidomain() %}
-                        <span class="input__domain">
-                            {{ domainIcon(domainId) }}
-                        </span>
-                    {% endif %}
-                </div>
-            </div>
+        <div class="input-icon mb-3">
+            {% set inputAttr = attr %}
+            {% if isMultidomain() %}
+                <span class="input-icon-addon">
+                    {{ domainIcon(domainId) }}
+                </span>
+            {% endif %}
+            {% if isMultidomain() %}
+                {% set inputAttr = inputAttr|merge({'class': (inputAttr.class|default('') ~ ' form-control')|trim}) %}
+            {% endif %}
+            {{ form_widget(form, { attr: inputAttr }) }}
             {{ form_errors(form) }}
         </div>
     {% else %}
@@ -218,21 +207,18 @@
                 {{ seoFormRowMacros.multidomainRow(form, form.vars.label|trans, form.vars.macro.recommended_length) }}
             {% endif %}
         {% else %}
-            <div class="form-line{{ attr.disabledField is defined ? ' form-input-disabled form-line--disabled' }}">
-            {{ form_label(form, label) }}
-            <div class="form-line__side">
-                <div class="form-line__item">
-                    {{ form_widget(form) }}
-                </div>
+            <div class="mb-3{{ attr.disabledField is defined ? ' form-input-disabled form-line--disabled' }}">
+                {{ form_label(form, label) }}
+                {{ form_widget(form) }}
                 {{ form_errors(form) }}
-            </div>
-            {% if attr.disabledField is defined %}
-                <span class="form-disabled {{ attr.disabledFieldClass }} js-tooltip" data-toggle="tooltip" data-placement="{{ attr.disabledFieldPlacement|default('right') }}"
-                    title="{{ attr.disabledFieldTitle }}">
+                {% if attr.disabledField is defined %}
+                    <span class="form-disabled {{ attr.disabledFieldClass }} js-tooltip" data-toggle="tooltip"
+                          data-placement="{{ attr.disabledFieldPlacement|default('right') }}"
+                          title="{{ attr.disabledFieldTitle }}">
                     <i class="svg svg-pencil"></i>
                 </span>
-            {% endif %}
-        </div>
+                {% endif %}
+            </div>
         {% endif %}
     {% endif %}
 {%- endblock text_row %}
@@ -257,7 +243,7 @@
             {{ form_errors(form) }}
         </div>
     {% else %}
-        <div class="form-line">
+        <div class="mb-3">
             {{ form_label(form, label) }}
             <div class="form-line__side">
                 <div class="form-line__item">
@@ -290,38 +276,38 @@
             {% if js_container is not null %}
                 <div class="{{ js_container.container_class }}" data-type="{{ js_container.data_type }}">
             {% endif %}
-            <div class="form-line{% if multidomain is defined and multidomain and isMultidomain() %} form-line--no-horizontal-gap{% endif %}">
-            {% if multidomain is defined and multidomain %}
-                {% if isMultidomain() %}
-                    {{ form_label(form, getDomainName(domainId)) }}
+            <div class="mb-3{% if multidomain is defined and multidomain and isMultidomain() %} form-line--no-horizontal-gap{% endif %}">
+                {% if multidomain is defined and multidomain %}
+                    {% if isMultidomain() %}
+                        {{ form_label(form, getDomainName(domainId)) }}
+                    {% endif %}
+                {% else %}
+                    {{ form_label(form, label) }}
                 {% endif %}
-            {% else %}
-                {{ form_label(form, label) }}
-            {% endif %}
-            {{- form_errors(form) -}}
-            {% if newline is not defined %}
-                {% if multidomain is defined and multidomain and isMultidomain() %}
-                    <div class="form-line__side form-line__side--multidomain">
-                        <div class="input__wrap">
-                            {{- form_widget(form, { attr: { class: 'input--domain' }}) -}}
-                            <span class="input__domain">
+                {{- form_errors(form) -}}
+                {% if newline is not defined %}
+                    {% if multidomain is defined and multidomain and isMultidomain() %}
+                        <div class="form-line__side form-line__side--multidomain">
+                            <div class="input__wrap">
+                                {{- form_widget(form, { attr: { class: 'input--domain' }}) -}}
+                                <span class="input__domain">
                                 {{ domainIcon(domainId) }}
                             </span>
+                            </div>
                         </div>
-                    </div>
+                    {% else %}
+                        <div class="form-line__side">
+                            <div class="form-line__item form-line__item--full-width">
+                                {{- form_widget(form) -}}
+                            </div>
+                        </div>
+                    {% endif %}
                 {% else %}
-                    <div class="form-line__side">
-                        <div class="form-line__item form-line__item--full-width">
-                            {{- form_widget(form) -}}
-                        </div>
+                    <div{% if isMultidomain() %} class="form-line__side"{% endif %}>
+                        {% set inputAttr = attr|merge({'class': (attr.class|default('') ~ ' input--textarea')|trim}) %}
+                        {{- form_widget(form, { attr: inputAttr } ) -}}
                     </div>
                 {% endif %}
-            {% else %}
-                <div{% if isMultidomain() %} class="form-line__side"{% endif %}>
-                    {% set inputAttr = attr|merge({'class': (attr.class|default('') ~ ' input--textarea')|trim}) %}
-                    {{- form_widget(form, { attr: inputAttr } ) -}}
-                </div>
-            {% endif %}
             </div>
             {% if js_container is not null %}
                 </div>
@@ -331,7 +317,7 @@
 {%- endblock textarea_row %}
 
 {% block url_list_row -%}
-    <div class="form-line">
+    <div class="mb-3">
         {{ form_label(form, label, { label_attr: {class: 'form-line__label'} }) }}
         {{- form_errors(form) -}}
         <div class="form-line__full">
@@ -375,13 +361,16 @@
                                     {{ form_widget(friendlyUrlForm, {attr: {class: 'js-entity-url-list-row-checkbox display-none'}}) }}
                                 </span>
 
-                                <a href="{{ absoluteUrl }}" title="{{ 'Open in a new tab'|trans }}" class="js-tooltip text-no-decoration in-icon in-icon--link form-choice-list__item__action form-choice-list__item__action--link" target="_blank" data-toggle="tooltip" data-placement="top">
+                                <a href="{{ absoluteUrl }}" title="{{ 'Open in a new tab'|trans }}"
+                                   class="js-tooltip text-no-decoration in-icon in-icon--link form-choice-list__item__action form-choice-list__item__action--link"
+                                   target="_blank" data-toggle="tooltip" data-placement="top">
                                     <i class="svg svg-forward-page"></i>
                                 </a>
 
                                 <span class="js-entity-url-list-row-delete-revert-wrapper">
                                     <span class="js-entity-url-list-row-delete-block">
-                                        <button class="btn-no-style form-choice-list__item__action js-entity-url-list-row-delete-block-button" type="button">
+                                        <button class="btn-no-style form-choice-list__item__action js-entity-url-list-row-delete-block-button"
+                                                type="button">
                                             <span class="svg svg-delete-thin in-icon in-icon--delete"></span>
                                         </button>
                                     </span>
@@ -391,22 +380,25 @@
                                         </button>
 
                                         <span title="{{ 'URL will be deleted after saving.'|trans }}"
-                                            class="js-tooltip cursor-help form-icon" data-toggle="tooltip" data-placement="top">
+                                              class="js-tooltip cursor-help form-icon" data-toggle="tooltip"
+                                              data-placement="top">
                                             <span class="svg svg-info"></span>
                                         </span>
                                     </span>
                                 </span>
                                 <span title="{{ 'Main URL can\'t be deleted'|trans }}"
-                                    class="js-entity-url-list-info-main-delete js-tooltip cursor-help display-none form-choice-list__item__action" data-toggle="tooltip" data-placement="top">
+                                      class="js-entity-url-list-info-main-delete js-tooltip cursor-help display-none form-choice-list__item__action"
+                                      data-toggle="tooltip" data-placement="top">
                                     <span class="svg svg-info in-icon in-icon--info "></span>
                                 </span>
-                        </label>
+                            </label>
                         {% endfor %}
                     </div>
                 </div>
             </div>
         {% endfor %}
-        <div id="{{ form.newUrls.vars.id }}" class="js-entity-url-list-new-urls" data-new-url-prototype="{{ form_widget(form.newUrls.vars.prototype)|e }}">
+        <div id="{{ form.newUrls.vars.id }}" class="js-entity-url-list-new-urls"
+             data-new-url-prototype="{{ form_widget(form.newUrls.vars.prototype)|e }}">
             {% for newUrlForm in form.newUrls %}
                 {{ form_widget(newUrlForm) }}
             {% endfor %}
@@ -452,17 +444,12 @@
             {% if label is empty %}
                 {% set label = name|humanize %}
             {% endif %}
-            <label class="{{ isCheckbox|default(false) or isSimple|default(false) ? '' : 'form-line__label' }}"{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-                {% if raw is not defined %}
-                    {{ label }}{% if not isCheckbox|default(false) %}:{% endif %}
-                {% else %}
-                    {{ label|raw }}{% if not isCheckbox|default(false) %}:{% endif %}
-                {% endif %}
-                {% if required %}
-                    <span class="js-form-compulsory form-compulsory {{ isCheckbox|default(false) or isSimple|default(false) ? '' : 'form-line__compulsory' }} {{ compulsoryClass|default('') }}">
-                        <img src="{{ asset('public/admin/images/icons/star.png') }}" />
-                    </span>
-                {% endif %}
+            <label class="{% if required %}required {% endif %}{{ isCheckbox|default(false) or isSimple|default(false) ? '' : 'form-label' }}"{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {% if raw is not defined %}
+                {{ label }}{% if not isCheckbox|default(false) %}:{% endif %}
+            {% else %}
+                {{ label|raw }}{% if not isCheckbox|default(false) %}:{% endif %}
+            {% endif %}
             </label>
         {% endif %}
     {% endapply %}
@@ -479,7 +466,7 @@
     {% endif %}
 
     {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ' ~ class)|trim}) %}
-    <label>
+    <label class="form-label">
         {{ parent('form_widget_simple') }}
         <span class="css-checkbox__image"></span>
     </label>
@@ -495,7 +482,7 @@
 {% block radio_widget %}
     {% set class = 'css-radio' %}
     {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ' ~ class)|trim}) %}
-    <label>
+    <label class="form-label">
         {{ parent('form_widget_simple') }}
         <span class="css-radio__image"></span>
     </label>
@@ -509,25 +496,26 @@
     <span class="js-product-picker-container" data-placeholder="{{ placeholder }}">
         <div class="form-line__item">
             <input
-                class="input js-product-picker-label"
-                value="{{ productName|default(placeholder) }}"
-                disabled="disabled"
-                readonly="readonly"
+                    class="input js-product-picker-label"
+                    value="{{ productName|default(placeholder) }}"
+                    disabled="disabled"
+                    readonly="readonly"
             />
             <span class="form-line__item form-line__item--button form-line__item--fixed-width-left">
                 <button
-                    type="button"
-                    data-product-picker-url="{{ url('admin_productpicker_picksingle', {allowMainVariants: allow_main_variants, allowVariants: allow_variants}) }}"
-                    class="js-product-picker-create-picker-button btn btn--chooser"
-                    title="{{ 'Click to go to product section'|trans }}"
-                    type="button"
+                        type="button"
+                        data-product-picker-url="{{ url('admin_productpicker_picksingle', {allowMainVariants: allow_main_variants, allowVariants: allow_variants}) }}"
+                        class="js-product-picker-create-picker-button btn btn--chooser"
+                        title="{{ 'Click to go to product section'|trans }}"
+                        type="button"
                 >
                     ...
                 </button>
             </span>
         </div>
         {% if enableRemove %}
-            <a href="#" title="{{ 'Remove'|trans }}" class="in-icon in-icon--delete svg svg-trash form-line__item form-line__item--info-baseline js-product-picker-remove-button display-none"></a>
+            <a href="#" title="{{ 'Remove'|trans }}"
+               class="in-icon in-icon--delete svg svg-trash form-line__item form-line__item--info-baseline js-product-picker-remove-button display-none"></a>
         {% endif %}
         {{- form_widget(form, {attr: {class: 'js-product-picker-input'}}) -}}
     </span>
@@ -565,7 +553,8 @@
             {% endif %}
             <span class="js-products-picker-item-product-name">
                 {% if product is not null %}
-                    <a href="{{ url('admin_product_edit', {id: product.id}) }}" target="_blank" class="btn-link-style btn-link-style--iconic-l">
+                    <a href="{{ url('admin_product_edit', {id: product.id}) }}" target="_blank"
+                       class="btn-link-style btn-link-style--iconic-l">
                         <span>{{ product.name }}</span>&nbsp;<i class="svg svg-forward-page"></i>
                     </a>
                 {% endif %}
@@ -584,22 +573,22 @@
     {% import _self as self %}
     {% set attr = attr|merge({'class': (attr.class|default('') ~ ' js-products-picker')|trim}) %}
     <div
-        {{ block('widget_attributes') }}
-        data-products-picker-prototype="{{ self.productsWidgetItem(null, form.vars.prototype, form.vars.sortable)|e }}"
-        data-products-picker-url="{{ url('admin_productpicker_pickmultiple', {jsInstanceId: '__js_instance_id__', allowMainVariants: allow_main_variants, allowVariants: allow_variants}) }}"
-        data-products-picker-main-product-id="{{ form.vars.main_product ? form.vars.main_product.id : '' }}"
+            {{ block('widget_attributes') }}
+            data-products-picker-prototype="{{ self.productsWidgetItem(null, form.vars.prototype, form.vars.sortable)|e }}"
+            data-products-picker-url="{{ url('admin_productpicker_pickmultiple', {jsInstanceId: '__js_instance_id__', allowMainVariants: allow_main_variants, allowVariants: allow_variants}) }}"
+            data-products-picker-main-product-id="{{ form.vars.main_product ? form.vars.main_product.id : '' }}"
     >
         <table class="table-form">
             <thead class="js-products-picker-header">
-                <tr class="table-form__row">
-                    <td class="table-form__cell">{{ 'Name'|trans }}</td>
-                    <td class="table-form__cell table-form__cell--actions"></td>
-                </tr>
+            <tr class="table-form__row">
+                <td class="table-form__cell">{{ 'Name'|trans }}</td>
+                <td class="table-form__cell table-form__cell--actions"></td>
+            </tr>
             </thead>
             <tbody class="js-products-picker-items">
-                {% for key, productForm in form %}
-                    {{ self.productsWidgetItem(form.vars.products[key], productForm, form.vars.sortable) }}
-                {% endfor %}
+            {% for key, productForm in form %}
+                {{ self.productsWidgetItem(form.vars.products[key], productForm, form.vars.sortable) }}
+            {% endfor %}
             </tbody>
         </table>
         <div class="form-line form-line--no-top-border">
@@ -616,39 +605,39 @@
 {% block categories_widget %}
     <div class="form-line__{% if display_as_row == true %}side{% else %}line{% endif %}">
         <div
-            class="form-tree form-tree--open js-category-tree-form"
-            data-prototype="{{
-                '<li class="form-tree__item js-category-tree-form-item">' ~
+                class="form-tree form-tree--open js-category-tree-form"
+                data-prototype="{{ '<li class="form-tree__item js-category-tree-form-item">' ~
                 form_widget(form.vars.prototype) ~
                 '<ul class="js-category-tree-form-children-container">' ~
-                '</ul></li>'
-            }}"
-            data-hidden-item-class="form-tree__item--muted"
+                '</ul></li>' }}"
+                data-hidden-item-class="form-tree__item--muted"
         >
             <ul class="js-category-tree-form-children-container form-tree__content">
                 {% set level = 1 %}
 
                 {% for child in form.children %}
-                    {% set currentLevel = child.vars.level %}
+                {% set currentLevel = child.vars.level %}
 
-                    {% if not loop.first %}
-                        {% if currentLevel <= level %}
-                            {% for i in currentLevel .. level %}</ul></li>{% endfor %}
-                        {% endif %}
-                    {% endif %}
+                {% if not loop.first %}
+                {% if currentLevel <= level %}
+                {% for i in currentLevel .. level %}</ul>
+            </li>{% endfor %}
+            {% endif %}
+            {% endif %}
 
-                    <li
-                        class="form-tree__item {% if not child.vars.visible %}form-tree__item--muted{% endif %} js-category-tree-form-item"
-                        data-load-url="{{ url('admin_category_loadbranchjson', {id: child.vars.name, domainId: domain_id}) }}"
-                        data-has-children="{{ child.vars.has_children ? 'true' : 'false' }}"
-                    >
-                        {{ form_widget(child) }}
-                        <ul class="js-category-tree-form-children-container">
+            <li
+                    class="form-tree__item {% if not child.vars.visible %}form-tree__item--muted{% endif %} js-category-tree-form-item"
+                    data-load-url="{{ url('admin_category_loadbranchjson', {id: child.vars.name, domainId: domain_id}) }}"
+                    data-has-children="{{ child.vars.has_children ? 'true' : 'false' }}"
+            >
+                {{ form_widget(child) }}
+                <ul class="js-category-tree-form-children-container">
 
                     {% set level = currentLevel %}
-                {% endfor %}
+                    {% endfor %}
 
-                {% for i in 1 .. level %}</ul></li>{% endfor %}
+                    {% for i in 1 .. level %}</ul>
+            </li>{% endfor %}
             </ul>
 
         </div>
@@ -661,7 +650,7 @@
     <div class="form-tree__item__click">
         <span class="form-tree__item__icon js-category-tree-form-item-icon"></span>
         <span class="form-tree__item__name">
-            <label>
+            <label class="form-label"><label>
                 {{ block('checkbox_widget') }} {{ category_name }}
             </label>
         </span>
@@ -687,7 +676,8 @@
                     {% endif %}
                 </ul>
                 {% if not inline %}
-                    <span class="in-message__close js-validation-error-close"><i class="svg svg-circle-cross"></i></span>
+                    <span class="in-message__close js-validation-error-close"><i
+                                class="svg svg-circle-cross"></i></span>
                 {% endif %}
             </div>
         </div>
@@ -695,7 +685,7 @@
 {% endblock form_errors %}
 
 {% block form_widget_simple %}
-    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' input')|trim}) %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' form-control')|trim}) %}
     {{ parent('form_widget_simple') }}
     {{- block('appendix_block') -}}
 {% endblock form_widget_simple %}
@@ -759,30 +749,30 @@
 {% block choice_widget_collapsed -%}
     {% if isSimple|default(false) == false %}
         <div class="form-line__side">
-            <div class="form-line__item">
+        <div class="form-line__item">
     {% endif %}
-            {% if required and placeholder is none and not placeholder_in_choices and not multiple -%}
-                {% set required = false %}
-            {% endif %}
-            {% set attr = attr|merge({'class': (attr.class|default('') ~ ' input')|trim}) %}
-            <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
-                {% if placeholder is not none -%}
-                    <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder }}</option>
-                {%- endif %}
-                {%- if preferred_choices|length > 0 -%}
-                    {% set options = preferred_choices %}
-                    {{- block('choice_widget_options') -}}
-                    {% if choices|length > 0 and separator is not none -%}
-                        <option disabled="disabled">{{ separator }}</option>
-                    {%- endif %}
-                {%- endif -%}
-                {% set options = choices -%}
-                {{- block('choice_widget_options') -}}
-            </select>
+    {% if required and placeholder is none and not placeholder_in_choices and not multiple -%}
+        {% set required = false %}
+    {% endif %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' input')|trim}) %}
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+        {% if placeholder is not none -%}
+            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder }}</option>
+        {%- endif %}
+        {%- if preferred_choices|length > 0 -%}
+            {% set options = preferred_choices %}
+            {{- block('choice_widget_options') -}}
+            {% if choices|length > 0 and separator is not none -%}
+                <option disabled="disabled">{{ separator }}</option>
+            {%- endif %}
+        {%- endif -%}
+        {% set options = choices -%}
+        {{- block('choice_widget_options') -}}
+    </select>
 
     {% if isSimple|default(false) == false %}
-            </div>
-            {{- block('appendix_block') -}}
+        </div>
+        {{- block('appendix_block') -}}
         </div>
     {% else %}
         {{- block('appendix_block') -}}
@@ -805,7 +795,7 @@
 {% block choice_widget_expanded %}
     {% if isSimple|default(false) == false %}
         <div class="form-line__side">
-            <div class="form-line__item">
+        <div class="form-line__item">
     {% endif %}
     {% apply spaceless %}
         {% set attr = attr|merge({'class': (attr.class|default('') ~ ' form-choice-list')|trim}) %}
@@ -813,8 +803,8 @@
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' form-choice-list__item')|trim}) %}
             {% for child in form %}
                 <label {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-                    {{ form_widget(child, { inList: true }) }}
-                    {{ child.vars.label }}
+                {{ form_widget(child, { inList: true }) }}
+                {{ child.vars.label }}
                 </label>
             {% else %}
                 {{ empty_message }}
@@ -822,8 +812,8 @@
         </div>
     {% endapply %}
     {% if isSimple|default(false) == false %}
-            </div>
-            {{- block('appendix_block') -}}
+        </div>
+        {{- block('appendix_block') -}}
         </div>
     {% else %}
         {{- block('appendix_block') -}}
@@ -834,7 +824,7 @@
     {% import _self as self %}
     {% if isSimple|default(false) == false %}
         <div class="form-line__side">
-            <div class="form-line__item">
+        <div class="form-line__item">
     {% endif %}
 
     <div class="js-sortable-values-container">
@@ -851,9 +841,9 @@
         </select>
 
         <button
-            type="button"
-            class="btn btn--plus margin-top-10 margin-bottom-10 js-sortable-values-item-add"
-            data-item-template="{{ self.sortableValuesWidgetItem(item_input_name, '%value%', '%label%')|escape('html_attr') }}"
+                type="button"
+                class="btn btn--plus margin-top-10 margin-bottom-10 js-sortable-values-item-add"
+                data-item-template="{{ self.sortableValuesWidgetItem(item_input_name, '%value%', '%label%')|escape('html_attr') }}"
         >
             <i class="btn__icon">+</i>
             {{ 'Add'|trans }}
@@ -867,8 +857,8 @@
     </div>
 
     {% if isSimple|default(false) == false %}
-            </div>
-            {{- block('appendix_block') -}}
+        </div>
+        {{- block('appendix_block') -}}
         </div>
     {% else %}
         {{- block('appendix_block') -}}
@@ -888,6 +878,15 @@
     </div>
 {% endmacro %}
 
+{% block switch_row %}
+    {% import _self as self %}
+    <label class="form-check form-switch">
+        {{ form_widget(form, {attr: {class: 'form-check-input'}}) }}
+        <span class="form-check-label">{{ label }}</span>
+    </label>
+    {{ self.icon(attr) }}
+{% endblock %}
+
 {% block yes_no_row %}
     {% if multidomain is defined and multidomain %}
         {% if isMultidomain() %}
@@ -903,27 +902,27 @@
 {% block yes_no_widget %}
     {% if isSimple|default(false) == false %}
         <div class="form-line__side">
-            <div class="form-line__item">
+        <div class="form-line__item">
     {% endif %}
-    <div {{ block('widget_container_attributes') }}>
-        {% for child in form %}
-            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' form-choice')|trim}) %}
-            <label {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-                {{ form_widget(child, { attr: { class: 'form-choice__input' } }) }}
-                <span class="form-choice__label">
+<div {{ block('widget_container_attributes') }}>
+    {% for child in form %}
+        {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' form-choice')|trim}) %}
+        <label {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+        {{ form_widget(child, { attr: { class: 'form-choice__input' } }) }}
+        <span class="form-choice__label">
                     {{ child.vars.label }}
                 </span>
-            </label>
-        {% endfor %}
-        {% if isSimple|default(false) == false %}
-                    <div class="form-choice__info">
-                        {{- block('appendix_block') -}}
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            {{- block('appendix_block') -}}
-        {% endif %}
+        </label>
+    {% endfor %}
+    {% if isSimple|default(false) == false %}
+    <div class="form-choice__info">
+        {{- block('appendix_block') -}}
+    </div>
+    </div>
+    </div>
+    {% else %}
+        {{- block('appendix_block') -}}
+    {% endif %}
     </div>
 {% endblock yes_no_widget %}
 
@@ -942,17 +941,17 @@
     <div class="form-line__side">
         <div class="form-line__item">
             {% if isMultidomain() %}
-                    <select {{ block('widget_attributes') }}>
-                        {% for domainConfig in domainConfigs %}
-                            <option value="{{ domainConfig.id }}"{{ domainConfig.id == form.vars.value ? ' selected=""' : '' }}>
-                                {% if displayUrl %}
-                                    {{ domainConfig.url }}
-                                {% else %}
-                                    {{ domainConfig.name }}
-                                {% endif %}
-                            </option>
-                        {% endfor %}
-                    </select>
+                <select {{ block('widget_attributes') }}>
+                    {% for domainConfig in domainConfigs %}
+                        <option value="{{ domainConfig.id }}"{{ domainConfig.id == form.vars.value ? ' selected=""' : '' }}>
+                            {% if displayUrl %}
+                                {{ domainConfig.url }}
+                            {% else %}
+                                {{ domainConfig.name }}
+                            {% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
             {% else %}
                 <strong class="form-line__label">{{ getDomain().url }}</strong>
                 <input type="hidden" {{ block('widget_attributes') }} value="{{ getDomain().id }}" />
@@ -968,13 +967,13 @@
             {% for domainId, child in form %}
                 {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' form-choice-list__item')|trim}) %}
                 <label {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-                    {{ form_widget(child, { inList: true}) }}
-                    {% if isMultidomain() %}
-                        <span class="form-choice-list__icon">
+                {{ form_widget(child, { inList: true}) }}
+                {% if isMultidomain() %}
+                    <span class="form-choice-list__icon">
                             {{ domainIcon(domainId, 'small') }}
                         </span>
-                    {% endif %}
-                    {{ child.vars.label }}
+                {% endif %}
+                {{ child.vars.label }}
                 </label>
             {% endfor %}
         </div>
@@ -1049,14 +1048,14 @@
 {% block date_picker_widget %}
     {% if isSimple|default(false) == false %}
         <div class="form-line__side">
-            <div class="form-line__item">
+        <div class="form-line__item">
     {% endif %}
     {% apply spaceless %}
         {% set attr = attr|merge({'class': ((attr.class|default('') ~ ' js-date-picker input')|trim)}) %}
         {{- block('form_widget') -}}
     {% endapply %}
     {% if isSimple|default(false) == false %}
-            </div>
+        </div>
         </div>
     {% endif %}
 {% endblock date_picker_widget %}
@@ -1065,14 +1064,10 @@
     {% if js_container is not null %}
         <div class="{{ js_container.container_class }}" data-type="{{ js_container.data_type }}">
     {% endif %}
-    <div class="wrap-divider">
-        <div class="form-group">
-            <div class="form-group__title">
-                {{ form.vars.label }}
-            </div>
-            {{ form_widget(form) }}
-        </div>
-    </div>
+    <fieldset class="form-fieldset">
+        <legend>{{ form.vars.label }}</legend>
+        {{ form_widget(form) }}
+    </fieldset>
 
     {% if js_container is not null %}
         </div>
@@ -1081,9 +1076,11 @@
 
 {% macro icon(attr) %}
     {% if attr.icon is defined %}
-        <i class="svg svg-{{ attr.iconType|default('info') }} in-icon cursor-help form-line__item form-line__item--info js-tooltip"
-           data-toggle="tooltip" data-placement="{{ attr.iconPlacement|default('bottom') }}"
-           title="{{ attr.iconTitle|default('') }}"
-        ></i>
+        <span class="form-help"
+              data-bs-toggle="popover"
+              data-bs-placement="{{ attr.iconPlacement|default('top') }}"
+              data-bs-html="true"
+              data-bs-trigger="hover"
+              data-bs-content="{{ attr.iconTitle|default('') }}">?</span>
     {% endif %}
 {% endmacro %}

@@ -1,6 +1,58 @@
 {% extends '@ShopsysFramework/Admin/Layout/layout.html.twig' %}
 
 {% block content %}
+    <aside class="navbar navbar-vertical navbar-expand-sm navbar-transparent">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <h1 class="navbar-brand navbar-brand-autodark">
+                <a href="{{ url('admin_default_dashboard') }}">
+                    <img src="{{ asset('public/admin/images/logo.svg') }}" width="110" height="32"
+                         alt="Shopsys Platform" class="navbar-brand-image">
+                </a>
+            </h1>
+            <div class="collapse navbar-collapse" id="sidebar-menu">
+                {% block menu_panel %}
+                    {{ knp_menu_render('admin_side_menu', {template: '@ShopsysFramework/Admin/Menu/side_menu.html.twig'}) }}
+                {% endblock %}
+            </div>
+        </div>
+    </aside>
+    <div class="page-wrapper">
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        {% if showHeading is not defined or showHeading %}
+                            <!-- Page pre-title -->
+                            <div class="page-pretitle">
+                                Overview
+                            </div>
+                            <h2 class="page-title">
+                                {% block h1 %}{{ 'Administration'|trans }}{% endblock %}
+                                {% include '@ShopsysFramework/Admin/Layout/displayUuid.html.twig' %}
+                            </h2>
+                        {% endif %}
+                    </div>
+                    <!-- Page title actions -->
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                              <span class="d-none d-sm-inline">
+                                {% block btn %}{% endblock %}
+                              </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                {% block main_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    {#
     <div class="web__container">
         <div class="web__panel js-web-panel">
             <div class="web__panel__in">
@@ -35,5 +87,5 @@
             {% block main_content %}{% endblock %}
         </div>
         <div class="web__content__overlay js-side-menu-overlay"></div>
-    </div>
+    </div> #}
 {% endblock %}

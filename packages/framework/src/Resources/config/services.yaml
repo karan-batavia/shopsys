@@ -265,9 +265,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
-    Shopsys\FrameworkBundle\Component\Error\NotLogFakeHttpExceptionsErrorListener:
-        alias: exception_listener
-
     Shopsys\FrameworkBundle\Component\FileUpload\DoctrineListener:
         tags:
             - { name: doctrine.event_listener, event: postPersist }
@@ -1047,16 +1044,10 @@ services:
         public: true
         synthetic: true
 
-    exception_listener:
-        arguments:
-            - '%kernel.error_controller%'
-            - '@Shopsys\FrameworkBundle\Component\Error\ErrorIdProvider'
-            - '@?logger'
-            - '%kernel.debug%'
-        class: Shopsys\FrameworkBundle\Component\Error\NotLogFakeHttpExceptionsErrorListener
+    Shopsys\FrameworkBundle\Component\Log\ErrorIdLogProcessor:
         tags:
             - { name: 'kernel.event_subscriber' }
-            - { name: 'monolog.logger', channel: 'request' }
+            - { name: 'monolog.processor' }
 
     fragment.handler:
         arguments:

@@ -113,6 +113,25 @@ private function method()
      * @param \PhpCsFixer\Tokenizer\Tokens $tokens
      * @return bool
      */
+    private function isFinalClass(Tokens $tokens): bool
+    {
+        foreach ($tokens as $index => $token) {
+            if ($token->isGivenKind(T_FINAL)) {
+                $nextIndex = $tokens->getNextMeaningfulToken($index);
+
+                if ($nextIndex !== null && $tokens[$nextIndex]->isGivenKind(T_CLASS)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \PhpCsFixer\Tokenizer\Tokens $tokens
+     * @return bool
+     */
     private function checkNamespace(Tokens $tokens): bool
     {
         try {
@@ -166,6 +185,10 @@ private function method()
      */
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
+        if ($this->isFinalClass($tokens)) {
+            return;
+        }
+
         foreach (array_keys($tokens->findGivenKind(T_PRIVATE)) as $index) {
             $tokens[$index] = new Token([T_PROTECTED, 'protected']);
         }

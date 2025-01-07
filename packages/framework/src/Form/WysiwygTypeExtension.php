@@ -18,8 +18,6 @@ class WysiwygTypeExtension extends AbstractTypeExtension
 
     protected const ADMIN_WYSIWYG_ENTRY = 'admin-wysiwyg';
 
-    protected const FRONTEND_WYSIWYG_ENTRY_PREFIX = 'frontend-wysiwyg-';
-
     /**
      * @param \Shopsys\FrameworkBundle\Component\Domain\Domain $domain
      * @param \Shopsys\FrameworkBundle\Model\Localization\Localization $localization
@@ -68,12 +66,6 @@ class WysiwygTypeExtension extends AbstractTypeExtension
 
         if (array_key_exists(static::ADMIN_WYSIWYG_ENTRY, $entrypoints) === true) {
             $entrypointsOutput = array_merge($entrypointsOutput, $entrypoints[static::ADMIN_WYSIWYG_ENTRY]['css']);
-        }
-
-        $keyOfFrontendWysiwygLess = static::FRONTEND_WYSIWYG_ENTRY_PREFIX . $this->domain->getCurrentDomainConfig()->getStylesDirectory();
-
-        if (array_key_exists($keyOfFrontendWysiwygLess, $entrypoints) === true) {
-            $entrypointsOutput = array_merge($entrypointsOutput, $entrypoints[$keyOfFrontendWysiwygLess]['css']);
         }
 
         return $entrypointsOutput;

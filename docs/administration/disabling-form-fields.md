@@ -10,4 +10,4 @@ To enable disabling defined fields there, need to be set ENV variable `DISABLE_F
 
 ## Define disabled fields
 
-Disabled fields are defined by constant `DISABLED_FIELDS` for example in: `App\Form\Admin\CategoryFormTypeExtension`
+Disabled fields are defined by constant `DISABLED_FIELDS` for example in: `App\Form\Admin\CustomerUserFormTypeExtension`

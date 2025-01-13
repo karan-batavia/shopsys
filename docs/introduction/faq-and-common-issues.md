@@ -204,3 +204,9 @@ To resolve this issue, you can modify your Git configuration to allow long paths
 ```bash
 git config --system core.longpaths true
 ```
+
+## My Elasticsearch aggregation results are limited, how can I increase the limit?
+
+We limit the number of aggregation results using `Shopsys\FrameworkBundle\Model\Product\Search\FilterQuery::MAXIMUM_REASONABLE_AGGREGATION_BUCKET_COUNT` constant.
+You can override this constant in your project to increase the limit.
+Refer to the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-size) for more information about the setting.

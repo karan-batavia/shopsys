@@ -79,14 +79,14 @@ class FilterQueryTest extends ParameterTransactionFunctionalTestCase
         $this->skipTestIfFirstDomainIsNotInEnglish();
 
         $brandGenius = $this->getReference(BrandDataFixture::BRAND_GENIUS, Brand::class);
-        $flagSale = $this->getReference(FlagDataFixture::FLAG_PRODUCT_SALE, Flag::class);
+        $flagMadeInCz = $this->getReference(FlagDataFixture::FLAG_PRODUCT_MADEIN_CZ, Flag::class);
 
         $filter = $this->createFilter()
             ->filterByBrands([$brandGenius->getId()])
-            ->filterByFlags([$flagSale->getId()])
+            ->filterByFlags([$flagMadeInCz->getId()])
             ->applyOrderingByIdAscending();
 
-        $this->assertIdWithFilter($filter, []);
+        $this->assertIdWithFilter($filter, [16, 19]);
     }
 
     public function testMultiFilter(): void
@@ -126,7 +126,7 @@ class FilterQueryTest extends ParameterTransactionFunctionalTestCase
 
         $parameterCover = $this->getReference(ParameterDataFixture::PARAM_COVER, Parameter::class);
         $parameterPagesCount = $this->getReference(ParameterDataFixture::PARAM_PAGES_COUNT, Parameter::class);
-        $parameterDimensions = $this->getReference(ParameterDataFixture::PARAM_DIMENSIONS, Parameter::class);
+        $parameterWeight = $this->getReference(ParameterDataFixture::PARAM_WEIGHT, Parameter::class);
 
         $parameters = [$parameterCover->getId() => [$this->getParameterValueIdForFirstDomain(
             'hardcover',
@@ -136,14 +136,14 @@ class FilterQueryTest extends ParameterTransactionFunctionalTestCase
             '55',
         ), $this->getParameterValueIdForFirstDomain(
             '48',
-        )], $parameterDimensions->getId() => [$this->getParameterValueIdForFirstDomain(
+        )], $parameterWeight->getId() => [$this->getParameterValueIdForFirstDomain(
             '50',
         )]];
 
         $filter = $this->createFilter()
             ->filterByParameters($parameters);
 
-        $this->assertIdWithFilter($filter, []);
+        $this->assertIdWithFilter($filter, [25, 28]);
     }
 
     public function testOrdering(): void

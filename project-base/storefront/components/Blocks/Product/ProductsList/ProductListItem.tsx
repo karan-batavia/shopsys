@@ -94,7 +94,7 @@ export const ProductListItem = forwardRef<HTMLLIElement, ProductItemProps>(
                             gtmProductListName,
                             listIndex,
                             url,
-                            // !!currentCustomerData?.arePricesHidden,
+                            // !!currentCustomerData?.arePricesHidden, TODO: fix GTM
                             false,
                         );
                         onClick?.(product, listIndex);

@@ -3,11 +3,9 @@
 import { ProductListItemImage } from './ProductListItemImage';
 import { ExtendedNextLink } from 'components/Basic/ExtendedNextLink/ExtendedNextLink';
 import { VariantIcon } from 'components/Basic/Icon/VariantIcon';
-import { ProductCompareButton } from 'components/Blocks/Product/ButtonsAction/ProductCompareButton';
-import { ProductWishlistButton } from 'components/Blocks/Product/ButtonsAction/ProductWishlistButton';
-import { ProductAction } from 'components/Blocks/Product/ProductAction';
 import { ProductAvailability } from 'components/Blocks/Product/ProductAvailability';
 import { ProductPrice } from 'components/Blocks/Product/ProductPrice';
+import { useCurrentCustomerData } from 'components/providers/AuthProvider';
 import { useDomainConfig } from 'components/providers/DomainConfigProvider';
 import { useTranslation } from 'components/providers/TranslationProvider';
 import { TIDs } from 'cypress/tids';
@@ -69,7 +67,7 @@ export const ProductListItem = forwardRef<HTMLLIElement, ProductItemProps>(
     ) => {
         const { url } = useDomainConfig();
         const { t } = useTranslation();
-        // const currentCustomerData = useCurrentCustomerData();
+        const currentCustomerData = useCurrentCustomerData();
 
         return (
             <li
@@ -94,8 +92,7 @@ export const ProductListItem = forwardRef<HTMLLIElement, ProductItemProps>(
                             gtmProductListName,
                             listIndex,
                             url,
-                            // !!currentCustomerData?.arePricesHidden, TODO: fix GTM
-                            false,
+                            !!currentCustomerData?.arePricesHidden,
                         );
                         onClick?.(product, listIndex);
                     }}
@@ -140,16 +137,16 @@ export const ProductListItem = forwardRef<HTMLLIElement, ProductItemProps>(
                 </ExtendedNextLink>
 
                 <div className="flex w-full items-center justify-between gap-1 px-2.5 sm:justify-normal sm:gap-2.5 sm:px-5">
-                    {visibleItemsConfig.addToCart && (
+                    {/* {visibleItemsConfig.addToCart && (
                         <ProductAction
                             gtmMessageOrigin={gtmMessageOrigin}
                             gtmProductListName={gtmProductListName}
                             listIndex={listIndex}
                             product={product}
                         />
-                    )}
+                    )} */}
 
-                    {visibleItemsConfig.productListButtons && (
+                    {/* {visibleItemsConfig.productListButtons && (
                         <>
                             <ProductCompareButton
                                 isProductInComparison={isProductInComparison}
@@ -160,7 +157,7 @@ export const ProductListItem = forwardRef<HTMLLIElement, ProductItemProps>(
                                 toggleProductInWishlist={toggleProductInWishlist}
                             />
                         </>
-                    )}
+                    )} */}
                 </div>
             </li>
         );

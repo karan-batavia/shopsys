@@ -82,6 +82,7 @@ class LoginController extends AbstractConvertimController
             $token = $this->oAuthFactory->createConvertimOauth()->getUserLoginToken($request->get('authCode'));
             $customerUserUuid = $token->claims()->get('data')['eshopId'];
             $customerUser = $this->customerUserFacade->getByUuid($customerUserUuid);
+            $cartUuid = $request->cookies->get('cartUuid');
 
             $loginResultData = $this->loginAsUserFacade->runLoginSteps(
                 $customerUser,
@@ -89,7 +90,7 @@ class LoginController extends AbstractConvertimController
                 false,
                 [],
                 true,
-                null,
+                $cartUuid,
                 null,
             );
 

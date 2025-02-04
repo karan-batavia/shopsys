@@ -6,8 +6,7 @@ import { useFormatPrice } from 'utils/formatting/useFormatPrice';
 
 const barWrapperTwClass = 'relative order-1 h-[4px] vl:order-0';
 const barTwClass = 'absolute top-1/2 left-0 h-[4px] w-full bg-borderAccentLess';
-const barRangeTwClass =
-    'relative h-[4px] rounded-md bg-actionPrimaryBorder transition-width ease-defaultTransition duration-200';
+const barRangeTwClass = 'relative h-[4px] rounded-md bg-inputFill transition-width ease-defaultTransition duration-200';
 const barRangeFullTwClass = barRangeTwClass + ' w-full';
 const freeTransportRangeTwClass = twJoin(
     'flex w-full flex-col text-base mb-7 max-w-[180px] text-center font-semibold font-secondary',

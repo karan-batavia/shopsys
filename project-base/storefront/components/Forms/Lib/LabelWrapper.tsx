@@ -70,7 +70,7 @@ export const LabelWrapper: FC<LabelWrapperProps> = ({
                             inputType === 'checkbox' ? 'rounded' : 'rounded-full p-[5px]',
                             'active:scale-90',
                             checked
-                                ? 'border-inputBorderActive bg-inputBackgroundActive group-hover:bg-inputBackgroundActive'
+                                ? 'bg-inputFill group-hover:bg-inputFill border-inputBorderActive'
                                 : 'border-2 group-hover:border-inputBorderHovered group-active:border-inputBorderHovered',
                             disabled &&
                                 'border-inputBorderDisabled group-hover:border-inputBorderDisabled group-hover:bg-inputBackgroundDisabled group-active:border-inputBorderDisabled',

@@ -14,15 +14,17 @@ export const ArticleDetailContent: FC<ArticleDetailContentProps> = ({ article })
 
     return (
         <Webline>
-            <ArticleTitle>{article.seoH1 || article.articleName}</ArticleTitle>
-            <p className="mb-2 px-5 text-left text-xs font-semibold text-textDisabled">
-                {formatDate(article.createdAt)}
-            </p>
-            {article.text !== null && (
-                <div className="order-2 mb-16 flex w-full flex-col">
-                    <GrapesJsParser text={article.text} visibleSliderItems={VISIBLE_SLIDER_ITEMS_ARTICLE} />
-                </div>
-            )}
+            <div className="mx-auto w-full max-w-[840px]">
+                <ArticleTitle>{article.seoH1 || article.articleName}</ArticleTitle>
+                <p className="mb-2 px-5 text-left text-xs font-semibold text-textDisabled">
+                    {formatDate(article.createdAt)}
+                </p>
+                {article.text !== null && (
+                    <div className="order-2 mb-16 flex w-full flex-col">
+                        <GrapesJsParser text={article.text} visibleSliderItems={VISIBLE_SLIDER_ITEMS_ARTICLE} />
+                    </div>
+                )}
+            </div>
         </Webline>
     );
 };

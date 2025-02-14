@@ -13,7 +13,7 @@ export const ArticleDetailContent: FC<ArticleDetailContentProps> = ({ article })
     const { formatDate } = useFormatDate();
 
     return (
-        <Webline wrapperClassName='mx-auto w-full max-w-[840px]'>
+        <Webline wrapperClassName="mx-auto w-full max-w-[840px]">
             <ArticleTitle>{article.seoH1 || article.articleName}</ArticleTitle>
             <p className="mb-2 px-5 text-left text-xs font-semibold text-textDisabled">
                 {formatDate(article.createdAt)}

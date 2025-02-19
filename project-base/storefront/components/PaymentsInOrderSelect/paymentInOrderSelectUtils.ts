@@ -1,5 +1,11 @@
 import { useDomainConfig } from 'components/providers/DomainConfigProvider';
+import { useCurrentCustomerData } from 'connectors/customer/CurrentCustomer';
+import { TypeCartItemFragment } from 'graphql/requests/cart/fragments/CartItemFragment.generated';
 import { useChangePaymentInOrderMutation } from 'graphql/requests/orders/mutations/ChangePaymentInOrderMutation.generated';
+import { getGtmPaymentChangeEvent } from 'gtm/factories/getGtmPaymentChangeEvent';
+import { onGtmPaymentTryEventHandler } from 'gtm/handlers/onGtmPaymentEventHandler';
+import { mapGtmCartItemType } from 'gtm/mappers/mapGtmCartItemType';
+import { gtmSafePushEvent } from 'gtm/utils/gtmSafePushEvent';
 import useTranslation from 'next-translate/useTranslation';
 import { useRouter } from 'next/router';
 import { useIsUserLoggedIn } from 'utils/auth/useIsUserLoggedIn';
@@ -11,7 +17,8 @@ export const useChangePaymentInOrder = () => {
     const { t } = useTranslation();
     const router = useRouter();
     const isUserLoggedIn = useIsUserLoggedIn();
-    const { url } = useDomainConfig();
+    const { url, currencyCode } = useDomainConfig();
+    const currentCustomerData = useCurrentCustomerData();
     const [orderByHashUrl, customerOrderDetailUrl] = getInternationalizedStaticUrls(
         [{ url: '/order-detail/:urlHash', param: '' }, '/customer/order-detail'],
         url,
@@ -22,6 +29,7 @@ export const useChangePaymentInOrder = () => {
     const changePaymentInOrderHandler = async (
         orderUuid: string,
         paymentUuid: string,
+        paymentType: string,
         paymentGoPayBankSwift?: string | null,
         withRedirectAfterChanging = true,
     ) => {
@@ -38,18 +46,46 @@ export const useChangePaymentInOrder = () => {
 
         showSuccessMessage(t('Your payment has been successfully changed'));
 
+        gtmSafePushEvent(
+            getGtmPaymentChangeEvent(
+                {
+                    currencyCode: currencyCode,
+                    products: editedOrder.productItems.map((product) =>
+                        mapGtmCartItemType(product as unknown as TypeCartItemFragment, url),
+                    ),
+                    abandonedCartUrl: undefined,
+                    valueWithoutVat: null,
+                    valueWithVat: null,
+                },
+                editedOrder.payment,
+                !!currentCustomerData?.arePricesHidden,
+            ),
+        );
+
         if (!withRedirectAfterChanging) {
             return changePaymentInOrderData;
         }
 
+        let redirectPromise: Promise<boolean>;
+
         if (isUserLoggedIn) {
-            router.push({
+            redirectPromise = router.push({
                 pathname: customerOrderDetailUrl,
                 query: { orderNumber: editedOrder.number },
             });
         } else {
-            router.push(orderByHashUrl + editedOrder.urlHash);
+            redirectPromise = router.push(orderByHashUrl + editedOrder.urlHash);
         }
+
+        redirectPromise.then(() =>
+            onGtmPaymentTryEventHandler(
+                paymentUuid,
+                paymentType,
+                true,
+                undefined,
+                editedOrder.paymentTransactionsCount,
+            ),
+        );
 
         return changePaymentInOrderData;
     };

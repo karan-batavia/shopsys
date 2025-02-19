@@ -2,8 +2,50 @@ mutation ChangePaymentInOrderMutation($input: ChangePaymentInOrderInput!) {
     ChangePaymentInOrder(input: $input) {
         urlHash
         number
+        paymentTransactionsCount
         payment {
             ...SimplePaymentFragment
+        }
+        productItems {
+            uuid
+            __typename
+            quantity
+            product {
+                __typename
+                id
+                uuid
+                slug
+                ... on Variant {
+                    mainVariant {
+                        slug
+                    }
+                }
+                fullName
+                catalogNumber
+                isInquiryType
+                flags {
+                    ...SimpleFlagFragment
+                }
+                mainImage {
+                    ...ImageFragment
+                }
+                availability {
+                    ...AvailabilityFragment
+                }
+                price {
+                    ...ProductPriceFragment
+                }
+                availableStoresCount
+                unit {
+                    name
+                }
+                brand {
+                    ...SimpleBrandFragment
+                }
+                categories {
+                    name
+                }
+            }
         }
     }
 }

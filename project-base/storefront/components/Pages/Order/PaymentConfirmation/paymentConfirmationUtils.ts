@@ -1,4 +1,5 @@
 import { useUpdatePaymentStatusMutation } from 'graphql/requests/orders/mutations/UpdatePaymentStatusMutation.generated';
+import { onGtmPaymentTryEventHandler } from 'gtm/handlers/onGtmPaymentEventHandler';
 import {
     getGtmCreateOrderEventFromLocalStorage,
     removeGtmCreateOrderEventFromLocalStorage,
@@ -48,6 +49,13 @@ export const useUpdatePaymentStatus = (orderUuid: string, orderPaymentStatusPage
             wasPaymentStatusUpdatedRef.current = true;
         }
     }, []);
+
+    useEffect(() => {
+        if (paymentStatusData) {
+            const { paymentTransactionsCount, isPaid, payment } = paymentStatusData.UpdatePaymentStatus;
+            onGtmPaymentTryEventHandler(payment.uuid, payment.type, isPaid, undefined, paymentTransactionsCount);
+        }
+    }, [paymentStatusData]);
 
     return paymentStatusData;
 };

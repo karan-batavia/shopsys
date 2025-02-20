@@ -1,5 +1,5 @@
+import { useAuthorization } from 'components/providers/AuthorizationProvider';
 import { useDomainConfig } from 'components/providers/DomainConfigProvider';
-import { useCurrentCustomerData } from 'connectors/customer/CurrentCustomer';
 import { TypeCartItemFragment } from 'graphql/requests/cart/fragments/CartItemFragment.generated';
 import { useChangePaymentInOrderMutation } from 'graphql/requests/orders/mutations/ChangePaymentInOrderMutation.generated';
 import { getGtmPaymentChangeEvent } from 'gtm/factories/getGtmPaymentChangeEvent';
@@ -18,7 +18,7 @@ export const useChangePaymentInOrder = () => {
     const router = useRouter();
     const isUserLoggedIn = useIsUserLoggedIn();
     const { url, currencyCode } = useDomainConfig();
-    const currentCustomerData = useCurrentCustomerData();
+    const { canSeePrices } = useAuthorization();
     const [orderByHashUrl, customerOrderDetailUrl] = getInternationalizedStaticUrls(
         [{ url: '/order-detail/:urlHash', param: '' }, '/customer/order-detail'],
         url,
@@ -58,7 +58,7 @@ export const useChangePaymentInOrder = () => {
                     valueWithVat: null,
                 },
                 editedOrder.payment,
-                !!currentCustomerData?.arePricesHidden,
+                !canSeePrices,
             ),
         );
 

@@ -157,7 +157,12 @@ jobs:
             -   name: Create branch specific PHP-FPM image with project files
                 run: |
                     .github/build-php-fpm-image.sh "${{ needs.variables.outputs.DOCKER_PHP_FPM_REPOSITORY_TAG }}" production
-                    docker image push "${{ needs.variables.outputs.DOCKER_PHP_FPM_REPOSITORY_TAG }}"
+                    docker save "${{ needs.variables.outputs.DOCKER_PHP_FPM_REPOSITORY_TAG }}" > ${{ runner.temp }}/myimage_latest.tar
+            -   name: Upload artifact
+                uses: actions/upload-artifact@v4
+                with:
+                    name: myimage_latest.tar
+                    path: ${{ runner.temp }}/myimage_latest.tar
     build-storefront-image:
         if: |
             (
@@ -253,6 +258,15 @@ jobs:
             (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped')
         runs-on: ubuntu-22.04
         steps:
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: myimage_latest.tar
+                    path: ${{ runner.temp }}
+
+            -   name: Load image
+                run: |
+                    docker load --input ${{ runner.temp }}/myimage_latest.tar
             -   name: Download docker-compose.yml from artifacts
                 uses: actions/download-artifact@v4
                 with:

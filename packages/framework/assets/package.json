@@ -1,5 +1,6 @@
 {
     "name": "@shopsys/framework",
+    "private": true,
     "description": "Shopsys Platform assets files",
     "repository": "https://github.com/shopsys/shopsys",
     "author": "Shopsys",

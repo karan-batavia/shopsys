@@ -232,7 +232,7 @@ jobs:
             -   name: Load images
                 run: |
                     docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/storefront.tar
+                    docker load --input ${{ runner.temp }}/storefront-image.tar
             -   name: Build application
                 run: docker compose up -d --wait storefront php-fpm
             -   name: Move schema.graphql to Storefront container
@@ -315,7 +315,6 @@ jobs:
                     docker load --input ${{ runner.temp }}/elastic-image.tar
             -   name: Build application
                 run: |
-                    docker compose pull --parallel postgres webserver elasticsearch redis php-fpm
                     docker compose up -d postgres webserver elasticsearch redis php-fpm
                     docker compose exec -T php-fpm php phing -D production.confirm.action=y -D change.environment=dev environment-change test-dirs-create test-db-create frontend-api-generate-new-keys
             -   name: Run tests
@@ -361,7 +360,6 @@ jobs:
                     docker load --input ${{ runner.temp }}/elastic-image.tar
             -   name: Build application
                 run: |
-                    docker compose pull --parallel postgres webserver elasticsearch redis php-fpm
                     docker compose up -d postgres webserver elasticsearch redis php-fpm
                     docker compose cp ./project-base/app/config/domains.yaml php-fpm:/var/www/html/project-base/app/config/domains.yaml
                     docker compose cp ./project-base/app/src/DataFixtures/Demo/SettingValueDataFixture.php php-fpm:/var/www/html/project-base/app/src/DataFixtures/Demo/SettingValueDataFixture.php
@@ -403,7 +401,6 @@ jobs:
                     docker load --input ${{ runner.temp }}/elastic-image.tar
             -   name: Build application
                 run: |
-                    docker compose pull --parallel webserver postgres elasticsearch redis php-fpm selenium-server
                     docker compose up -d webserver postgres elasticsearch redis php-fpm selenium-server
                     docker compose exec -T php-fpm php phing -D production.confirm.action=y -D change.environment=dev environment-change test-dirs-create test-db-create frontend-api-generate-new-keys test-db-demo test-elasticsearch-index-recreate test-elasticsearch-export test-error-pages-generate tests-acceptance-build
             -   name: Run acceptance tests
@@ -640,7 +637,7 @@ jobs:
                         /repos/shopsys/shopsys/issues/${{ github.event.pull_request.number }}/labels/regenerate%20screenshots
     translations-dump-check:
         name: Check all translations and icons are dumped
-        needs: build-php-fpm-image
+        needs: [build-php-fpm-image, build-storefront-image]
         runs-on: ubuntu-22.04
         steps:
             -   name: GIT checkout branch - ${{ github.ref }}
@@ -656,9 +653,15 @@ jobs:
                 with:
                     name: php-fpm-image.tar
                     path: ${{ runner.temp }}
-            -   name: Load image
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: storefront-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load images
                 run: |
                     docker load --input ${{ runner.temp }}/php-fpm-image.tar
+                    docker load --input ${{ runner.temp }}/storefront-image.tar
             -   name: Build application
                 run: docker compose up -d php-fpm storefront
             -   name: Check translations are dumped
@@ -692,7 +695,7 @@ jobs:
                     fi
     check-console-commands:
         name: Check that all console commands that are not used during installation are passing
-        needs: build-php-fpm-image
+        needs: [build-php-fpm-image, build-storefront-image, build-elasticsearch-image]
         runs-on: ubuntu-22.04
         steps:
             -   name: GIT checkout branch - ${{ github.ref }}
@@ -708,9 +711,21 @@ jobs:
                 with:
                     name: php-fpm-image.tar
                     path: ${{ runner.temp }}
-            -   name: Load image
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: elastic-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: storefront-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load images
                 run: |
+                    docker load --input ${{ runner.temp }}/storefront-image.tar
                     docker load --input ${{ runner.temp }}/php-fpm-image.tar
+                    docker load --input ${{ runner.temp }}/elastic-image.tar
             -   name: Build application
                 run: |
                     docker compose up -d

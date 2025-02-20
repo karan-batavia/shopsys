@@ -126,12 +126,6 @@ jobs:
                     name: rabbitmq-vhost-sh
                     path: ./.github/rabbitmq-vhost.sh
     build-php-fpm-image:
-        if: |
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            needs.variables.outputs.DOCKER_PHP_FPM_REPOSITORY_TAG != ''
         name: Build PHP-FPM image
         runs-on: ubuntu-22.04
         needs: variables
@@ -157,18 +151,13 @@ jobs:
             -   name: Create branch specific PHP-FPM image with project files
                 run: |
                     .github/build-php-fpm-image.sh "${{ needs.variables.outputs.DOCKER_PHP_FPM_REPOSITORY_TAG }}" production
-                    docker save "${{ needs.variables.outputs.DOCKER_PHP_FPM_REPOSITORY_TAG }}" > ${{ runner.temp }}/myimage_latest.tar
+                    docker save "${{ needs.variables.outputs.DOCKER_PHP_FPM_REPOSITORY_TAG }}" > ${{ runner.temp }}/php-fpm-image.tar
             -   name: Upload artifact
                 uses: actions/upload-artifact@v4
                 with:
-                    name: myimage_latest.tar
-                    path: ${{ runner.temp }}/myimage_latest.tar
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}/php-fpm-image.tar
     build-storefront-image:
-        if: |
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            )
         name: Build storefront image
         runs-on: ubuntu-22.04
         needs: variables
@@ -189,7 +178,12 @@ jobs:
             -   name: Build Storefront image and push it to GitHub Container Registry
                 run: |
                     .github/build-storefront-image.sh ${{ needs.variables.outputs.DOCKER_STOREFRONT_REPOSITORY_TAG }}
-                    docker image push ${{ needs.variables.outputs.DOCKER_STOREFRONT_REPOSITORY_TAG }}
+                    docker save "${{ needs.variables.outputs.DOCKER_STOREFRONT_REPOSITORY_TAG }}" > ${{ runner.temp }}/storefront-image.tar
+            -   name: Upload artifact
+                uses: actions/upload-artifact@v4
+                with:
+                    name: storefront-image.tar
+                    path: ${{ runner.temp }}/storefront-image.tar
     build-storefront-ci-image:
         if: |
             (
@@ -219,12 +213,7 @@ jobs:
                     .github/build-storefront-ci-image.sh ${{ needs.variables.outputs.DOCKER_STOREFRONT_CI_REPOSITORY_TAG }}
                     docker image push ${{ needs.variables.outputs.DOCKER_STOREFRONT_CI_REPOSITORY_TAG }}
     build-elasticsearch-image:
-        if: |
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            needs.variables.outputs.DOCKER_ELASTICSEARCH_IMAGE_EXISTS == 0
+        if: needs.variables.outputs.DOCKER_ELASTICSEARCH_IMAGE_EXISTS == 0
         name: Build Elasticsearch image
         runs-on: ubuntu-22.04
         needs: variables
@@ -249,24 +238,16 @@ jobs:
     standards:
         name: Check standards
         needs: build-php-fpm-image
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped')
         runs-on: ubuntu-22.04
         steps:
             -   name: Download artifact
                 uses: actions/download-artifact@v4
                 with:
-                    name: myimage_latest.tar
+                    name: php-fpm-image.tar
                     path: ${{ runner.temp }}
-
             -   name: Load image
                 run: |
-                    docker load --input ${{ runner.temp }}/myimage_latest.tar
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
             -   name: Download docker-compose.yml from artifacts
                 uses: actions/download-artifact@v4
                 with:
@@ -282,14 +263,6 @@ jobs:
     standards-storefront:
         name: Check Storefront standards
         needs: [build-php-fpm-image, build-storefront-ci-image]
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped') &&
-            (needs.build-storefront-ci-image.result == 'success' || needs.build-storefront-ci-image.result == 'skipped')
         runs-on: ubuntu-22.04
         steps:
             -   name: GIT checkout branch - ${{ github.ref }}
@@ -300,6 +273,14 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                run: |
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
             -   name: Build application
                 run: docker compose up -d --wait storefront php-fpm
             -   name: Move schema.graphql to Storefront container
@@ -328,13 +309,6 @@ jobs:
     unit-test-storefront:
         name: Run unit tests of Storefront
         needs: [build-storefront-ci-image]
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-storefront-ci-image.result == 'success' || needs.build-storefront-ci-image.result == 'skipped')
         runs-on: ubuntu-22.04
         steps:
             -   name: GIT checkout branch - ${{ github.ref }}
@@ -355,14 +329,6 @@ jobs:
     tests-unit-functional-smoke:
         name: Run unit, functional and smoke tests
         needs: [build-php-fpm-image, build-elasticsearch-image]
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped') &&
-            (needs.build-elasticsearch-image.result == 'success' || needs.build-elasticsearch-image.result == 'skipped')
         runs-on: ubuntu-22.04
         steps:
             -   name: GIT checkout branch - ${{ github.ref }}
@@ -373,6 +339,14 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                run: |
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
             -   name: Build application
                 run: |
                     docker compose pull --parallel postgres webserver elasticsearch redis php-fpm
@@ -389,14 +363,6 @@ jobs:
     tests-unit-functional-smoke-first-czech-domain:
         name: Run unit, functional and smoke tests with first domain in Czech and with CZK currency
         needs: [build-php-fpm-image, build-elasticsearch-image]
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped') &&
-            (needs.build-elasticsearch-image.result == 'success' || needs.build-elasticsearch-image.result == 'skipped')
         runs-on: ubuntu-22.04
         steps:
             -   name: GIT checkout branch - ${{ github.ref }}
@@ -413,6 +379,14 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                run: |
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
             -   name: Build application
                 run: |
                     docker compose pull --parallel postgres webserver elasticsearch redis php-fpm
@@ -431,14 +405,6 @@ jobs:
     tests-acceptance:
         name: Run acceptance tests
         needs: [build-php-fpm-image, build-elasticsearch-image]
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped') &&
-            (needs.build-elasticsearch-image.result == 'success' || needs.build-elasticsearch-image.result == 'skipped')
         runs-on: ubuntu-22.04
         steps:
             -   name: GIT checkout branch - ${{ github.ref }}
@@ -449,6 +415,14 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                run: |
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
             -   name: Build application
                 run: |
                     docker compose pull --parallel webserver postgres elasticsearch redis php-fpm selenium-server
@@ -471,15 +445,6 @@ jobs:
     tests-storefront-acceptance:
         name: Run Cypress tests
         needs: [build-php-fpm-image, build-storefront-image, build-elasticsearch-image]
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped') &&
-            (needs.build-storefront-image.result == 'success' || needs.build-storefront-image.result == 'skipped') &&
-            (needs.build-elasticsearch-image.result == 'success' || needs.build-elasticsearch-image.result == 'skipped')
         runs-on: ubuntu-22.04
         strategy:
             fail-fast: false
@@ -510,6 +475,26 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose-cypress
+            -   name: Download artifact
+                if: env.SHOULD_RUN_TESTS == 'true'
+                uses: actions/download-artifact@v4
+                with:
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                if: env.SHOULD_RUN_TESTS == 'true'
+                run: |
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
+            -   name: Download artifact
+                if: env.SHOULD_RUN_TESTS == 'true'
+                uses: actions/download-artifact@v4
+                with:
+                    name: storefront-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                if: env.SHOULD_RUN_TESTS == 'true'
+                run: |
+                    docker load --input ${{ runner.temp }}/storefront-image.tar
             -   name: Build application
                 if: env.SHOULD_RUN_TESTS == 'true'
                 run: |
@@ -663,13 +648,6 @@ jobs:
     translations-dump-check:
         name: Check all translations and icons are dumped
         needs: build-php-fpm-image
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped')
         runs-on: ubuntu-22.04
         steps:
             -   name: GIT checkout branch - ${{ github.ref }}
@@ -680,6 +658,14 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                run: |
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
             -   name: Build application
                 run: docker compose up -d php-fpm storefront
             -   name: Check translations are dumped
@@ -714,13 +700,6 @@ jobs:
     check-console-commands:
         name: Check that all console commands that are not used during installation are passing
         needs: build-php-fpm-image
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped')
         runs-on: ubuntu-22.04
         steps:
             -   name: GIT checkout branch - ${{ github.ref }}
@@ -731,6 +710,14 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                run: |
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
             -   name: Build application
                 run: |
                     docker compose up -d
@@ -743,174 +730,9 @@ jobs:
                     docker compose exec -T php-fpm php bin/console shopsys:cdn-domain-url:replace
                     docker compose exec -T php-fpm php bin/console shopsys:list:export-scopes
                     docker compose exec -T php-fpm php bin/console shopsys:dispatch:recalculations 1
-    build-fork-docker-images:
-        if: |
-            github.event.pull_request.head.repo.full_name != 'shopsys/shopsys' &&
-            github.ref_protected != true
-        name: Build application and run standards checks and tests
-        runs-on: ubuntu-22.04
-        needs: variables
-        steps:
-            -   name: GIT checkout branch - ${{ github.ref }}
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.ref }}
-            -   name: Build Elasticsearch image
-                if: needs.variables.outputs.DOCKER_ELASTICSEARCH_IMAGE_EXISTS == 0
-                run: .github/build-elasticsearch-image.sh ${{ needs.variables.outputs.DOCKER_ELASTICSEARCH_REPOSITORY_TAG }}
-            -   name: Build Storefront image
-                if: needs.variables.outputs.DOCKER_STOREFRONT_IMAGE_EXISTS == 0
-                run: .github/build-storefront-image.sh ${{ needs.variables.outputs.DOCKER_STOREFRONT_REPOSITORY_TAG }}
-            -   name: Build Storefront CI image
-                if: needs.variables.outputs.DOCKER_STOREFRONT_CI_IMAGE_EXISTS == 0
-                run: .github/build-storefront-ci-image.sh ${{ needs.variables.outputs.DOCKER_STOREFRONT_CI_REPOSITORY_TAG }}
-            -   name: Build PHP-FPM image
-                run: .github/build-php-fpm-image.sh ${{ needs.variables.outputs.DOCKER_PHP_FPM_REPOSITORY_TAG }} base
-            -   name: Download docker-compose.cypress.yml from artifacts
-                uses: actions/download-artifact@v4
-                with:
-                    name: docker-compose
-            -   name: Build PHP-FPM part of application
-                run: |
-                    docker compose up -d --force-recreate
-                    docker cp ./ shopsys-framework-php-fpm:/var/www/html
-                    docker compose exec -T --user root php-fpm chown -R www-data:www-data /var/www/html
-                    docker compose exec -T php-fpm rm -rf /var/www/html/composer.lock /var/www/html/project-base/package-lock.json /var/www/html/project-base/migrations-lock.yml /var/www/html/project-base/storefront
-                    docker compose exec -T php-fpm composer install --optimize-autoloader --no-interaction
-                    docker compose exec -T php-fpm php phing -D production.confirm.action=y -D change.environment=dev environment-change dirs-create test-dirs-create assets npm build-version-generate db-create test-db-create db-demo elasticsearch-index-recreate elasticsearch-export error-pages-generate test-db-demo test-elasticsearch-index-recreate test-elasticsearch-export tests-acceptance-build
-            -   name: Check standards
-                run: docker compose exec -T php-fpm php phing standards
-            -   name: Run tests
-                run: docker compose exec -T php-fpm php phing tests
-            -   name: Run acceptance tests
-                run: docker compose exec -T php-fpm php phing tests-acceptance
-            -   name: Check translations are dumped
-                run: |
-                    docker compose exec -T php-fpm php phing translations-dump
-                    docker compose cp php-fpm:/var/www/html/ .
-                    rm -rf ./html/.git
-                    cp -a ./html/. ./
-                    rm -rf ./html
-                    docker compose exec -T storefront npm run translate
-                    if [ -n "$(git status --porcelain)" ]; then
-                        echo "Not all translations are dumped";
-                        git status
-                        exit 1;
-                    else
-                        echo "All translations are dumped";
-                        exit 0;
-                    fi
-            -   name: Check all not previously used commands are passing
-                run: |
-                    docker compose exec -T php-fpm php phing -D production.confirm.action=y frontend-api-enable cron-list cron-run-all-serially cron-watch maintenance-on maintenance-off elasticsearch-export-changed
-                    docker compose exec -T php-fpm php bin/console shopsys:categories:recalculate
-                    docker compose exec -T php-fpm php bin/console shopsys:cdn-domain-url:replace
-                    docker compose exec -T php-fpm php bin/console shopsys:list:export-scopes
-                    docker compose exec -T php-fpm php bin/console shopsys:dispatch:recalculations 1
-            -   name: PHP-FPM container logs
-                if: ${{ failure() }}
-                run: docker compose logs php-fpm
-            -   name: Storefront container logs
-                if: ${{ failure() }}
-                run: docker compose logs storefront
-            -   name: Copy Codeception logs from container
-                if: ${{ failure() }}
-                run: docker cp shopsys-framework-php-fpm:/var/www/html/project-base/app/var/log ./project-base/app/var/log
-            -   name: Upload Codeception logs to artifacts
-                if: ${{ failure() }}
-                uses: actions/upload-artifact@v4
-                with:
-                    name: acceptance-logs
-                    path: ./project-base/app/var/log/
-            -   name: Build Storefront part of application
-                run: |
-                    docker compose cp ./project-base/app/schema.graphql storefront:/home/node/app/schema.graphql
-                    docker compose exec storefront pnpm install --frozen-lockfile
-            -   name: Check no NEXT_PUBLIC_ variables are used in Storefront
-                run: |
-                    docker compose exec --user root storefront apk add grep
-                    docker compose exec storefront sh check-next-public-variable.sh
-            -   name: Check graphql schema files are up to date
-                run: |
-                    docker compose exec php-fpm php phing frontend-api-generate-graphql-schema
-                    docker compose cp php-fpm:/var/www/html/project-base/app/schema.graphql /tmp/schema.graphql
-                    docker compose cp /tmp/schema.graphql storefront:/home/node/app/schema.graphql
-                    docker compose exec storefront sh check-code-gen.sh
-            -   name: Check Storefront standards
-                run: docker compose exec storefront pnpm run check
-            -   name: Run storefront unit tests
-                run: docker compose exec storefront pnpm test--no-watch
-            -   name: Storefront container logs
-                if: ${{ failure() }}
-                run: docker compose logs storefront
-            -   name: PHP-FPM container logs
-                if: ${{ failure() }}
-                run: docker compose logs php-fpm
-            -   name: Download docker-compose.cypress.yml from artifacts
-                uses: actions/download-artifact@v4
-                with:
-                    name: docker-compose-cypress
-            -   name: Stop previous running application
-                run: docker compose down
-            -   name: Build application
-                run: |
-                    mv docker-compose.cypress.yml docker-compose.yml
-                    docker compose up -d --wait
-                    docker cp ./ shopsys-framework-php-fpm:/var/www/html
-                    docker compose exec -T --user root php-fpm chown -R www-data:www-data /var/www/html
-                    docker compose exec -T php-fpm rm -rf /var/www/html/composer.lock /var/www/html/project-base/package-lock.json /var/www/html/project-base/migrations-lock.yml
-                    docker compose exec -T php-fpm composer install --optimize-autoloader --no-interaction
-                    docker compose exec php-fpm php phing -D production.confirm.action=y db-create frontend-api-generate-new-keys build-demo-dev-quick error-pages-generate elasticsearch-index-recreate elasticsearch-export
-            -   name: Run Cypress tests
-                run: |
-                    PULL_REQUEST_LABELS=`gh api -H "Accept: application/vnd.github+json" /repos/shopsys/shopsys/issues/${{ github.event.pull_request.number }}/labels | jq '[.[].name]'`
-                    if ! echo "$PULL_REQUEST_LABELS" | jq -e '. | index("regenerate screenshots")' >/dev/null; then
-                        docker compose run cypress-regenerate
-                    else
-                        docker compose run cypress
-                    fi
-            -   name: Upload Cypress videos to artifacts
-                if: ${{ failure() }}
-                uses: actions/upload-artifact@v4
-                with:
-                    name: cypress-videos
-                    path: ./videos
-            -   name: Upload Cypress screenshots to artifacts
-                if: ${{ failure() }}
-                uses: actions/upload-artifact@v4
-                with:
-                    name: cypress-screenshots
-                    path: ./screenshots
-            -   name: Upload Cypress snapshot diffs to artifacts
-                if: ${{ failure() }}
-                uses: actions/upload-artifact@v4
-                with:
-                    name: cypress-snapshot-diffs
-                    path: ./snapshotDiffs
-            -   name: PHP-FPM container logs
-                if: ${{ failure() }}
-                run: docker compose logs php-fpm
-            -   name: Nginx container logs
-                if: ${{ failure() }}
-                run: docker compose logs webserver
-            -   name: Storefront container logs
-                if: ${{ failure() }}
-                run: docker compose logs storefront
-            -   name: Cypress container logs
-                if: ${{ failure() }}
-                run: docker compose logs cypress
     review:
         name: Review
         needs: [variables, build-php-fpm-image, build-storefront-image, build-elasticsearch-image]
-        if: |
-            always() && !failure() && !cancelled() &&
-            (
-                github.event.pull_request.head.repo.full_name == 'shopsys/shopsys' ||
-                github.ref_protected == true
-            ) &&
-            (needs.build-php-fpm-image.result == 'success' || needs.build-php-fpm-image.result == 'skipped') &&
-            (needs.build-storefront-image.result == 'success' || needs.build-storefront-image.result == 'skipped') &&
-            (needs.build-elasticsearch-image.result == 'success' || needs.build-elasticsearch-image.result == 'skipped')
         runs-on: [self-hosted, linux, review-stage]
         timeout-minutes: 10
         env:
@@ -960,6 +782,22 @@ jobs:
                 with:
                     name: rabbitmq-vhost-sh
                     path: ${{ needs.variables.outputs.BRANCH_NAME }}
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                run: |
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: storefront-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load image
+                run: |
+                    docker load --input ${{ runner.temp }}/storefront-image.tar
             -   name: Move docker-compose.review.yml to branch folder
                 if: "contains(github.event.pull_request.labels.*.name, 'Use docker-compose defined services for review')"
                 run: |
@@ -995,10 +833,10 @@ jobs:
         if: |
             always()
         name: Build successful
-        needs: [tests-acceptance, standards, tests-unit-functional-smoke, tests-unit-functional-smoke-first-czech-domain, standards-storefront, translations-dump-check, review, build-fork-docker-images, check-console-commands, tests-storefront-acceptance, tests-storefront-acceptance-regenerate, unit-test-storefront]
+        needs: [tests-acceptance, standards, tests-unit-functional-smoke, tests-unit-functional-smoke-first-czech-domain, standards-storefront, translations-dump-check, review, check-console-commands, tests-storefront-acceptance, tests-storefront-acceptance-regenerate, unit-test-storefront]
         runs-on: ubuntu-22.04
         env:
-            BUILD_FORK_RESULT: ${{ needs.build-fork-docker-images.result }}
+            BUILD_FORK_RESULT: "skipped"
             STANDARDS_RESULT: ${{ needs.standards.result }}
             TESTS_RESULT: ${{ needs.tests-unit-functional-smoke.result }}
             TESTS_CZECH_RESULT: ${{ needs.tests-unit-functional-smoke-first-czech-domain.result }}

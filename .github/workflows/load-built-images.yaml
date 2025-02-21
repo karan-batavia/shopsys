@@ -1,0 +1,29 @@
+name: Load Built Images
+
+on:
+    workflow_call:
+
+jobs:
+    setup:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Download php-fpm-image.tar
+                uses: actions/download-artifact@v4
+                with:
+                    name: php-fpm-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Download storefront-image.tar
+                uses: actions/download-artifact@v4
+                with:
+                    name: storefront-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Download elastic-image.tar
+                uses: actions/download-artifact@v4
+                with:
+                    name: elastic-image.tar
+                    path: ${{ runner.temp }}
+            -   name: Load images
+                run: |
+                    docker load --input ${{ runner.temp }}/storefront-image.tar
+                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
+                    docker load --input ${{ runner.temp }}/elastic-image.tar

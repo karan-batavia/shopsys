@@ -19,7 +19,6 @@ jobs:
         outputs:
             DOCKER_PHP_FPM_REPOSITORY_TAG: ${{ steps.variables.outputs.DOCKER_PHP_FPM_REPOSITORY_TAG }}
             DOCKER_STOREFRONT_REPOSITORY_TAG: ${{ steps.variables.outputs.DOCKER_STOREFRONT_REPOSITORY_TAG }}
-            DOCKER_STOREFRONT_CI_REPOSITORY_TAG: ${{ steps.variables.outputs.DOCKER_STOREFRONT_CI_REPOSITORY_TAG }}
             DOCKER_ELASTICSEARCH_REPOSITORY_TAG: ${{ steps.variables.outputs.DOCKER_ELASTICSEARCH_REPOSITORY_TAG }}
             DOCKER_ELASTICSEARCH_IMAGE_EXISTS: ${{ steps.variables.outputs.DOCKER_ELASTICSEARCH_IMAGE_EXISTS }}
             BRANCH_NAME: ${{ steps.variables.outputs.BRANCH_NAME }}
@@ -186,14 +185,8 @@ jobs:
         needs: build-php-fpm-image
         runs-on: ubuntu-22.04
         steps:
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Load image
-                run: |
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
+            -   name: Load images
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Download docker-compose.yml from artifacts
                 uses: actions/download-artifact@v4
                 with:
@@ -219,20 +212,8 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: storefront-image.tar
-                    path: ${{ runner.temp }}
             -   name: Load images
-                run: |
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/storefront-image.tar
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Build application
                 run: docker compose up -d --wait storefront php-fpm
             -   name: Move schema.graphql to Storefront container
@@ -271,14 +252,8 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: storefront-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Load image
-                run: |
-                    docker load --input ${{ runner.temp }}/storefront-image.tar
+            -   name: Load images
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Build application
                 run: docker compose up -d --wait storefront
             -   name: Run unit tests
@@ -299,20 +274,8 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: elastic-image.tar
-                    path: ${{ runner.temp }}
             -   name: Load images
-                run: |
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/elastic-image.tar
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Build application
                 run: |
                     docker compose up -d postgres webserver elasticsearch redis php-fpm
@@ -344,20 +307,8 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: elastic-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Load image
-                run: |
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/elastic-image.tar
+            -   name: Load images
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Build application
                 run: |
                     docker compose up -d postgres webserver elasticsearch redis php-fpm
@@ -385,20 +336,8 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: elastic-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Load image
-                run: |
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/elastic-image.tar
+            -   name: Load images
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Build application
                 run: |
                     docker compose up -d webserver postgres elasticsearch redis php-fpm selenium-server
@@ -450,30 +389,9 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose-cypress
-            -   name: Download artifact
-                if: env.SHOULD_RUN_TESTS == 'true'
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                if: env.SHOULD_RUN_TESTS == 'true'
-                uses: actions/download-artifact@v4
-                with:
-                    name: storefront-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                if: env.SHOULD_RUN_TESTS == 'true'
-                uses: actions/download-artifact@v4
-                with:
-                    name: elastic-image.tar
-                    path: ${{ runner.temp }}
             -   name: Load images
                 if: env.SHOULD_RUN_TESTS == 'true'
-                run: |
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/storefront-image.tar
-                    docker load --input ${{ runner.temp }}/elastic-image.tar
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Build application
                 if: env.SHOULD_RUN_TESTS == 'true'
                 run: |
@@ -551,30 +469,9 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose-cypress
-            -   name: Download artifact
-                if: steps.check-label-tests-regenerate.outputs.SHOULD_RUN_TESTS_REGENERATE == 'true'
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                if: steps.check-label-tests-regenerate.outputs.SHOULD_RUN_TESTS_REGENERATE == 'true'
-                uses: actions/download-artifact@v4
-                with:
-                    name: storefront-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                if: steps.check-label-tests-regenerate.outputs.SHOULD_RUN_TESTS_REGENERATE == 'true'
-                uses: actions/download-artifact@v4
-                with:
-                    name: elastic-image.tar
-                    path: ${{ runner.temp }}
             -   name: Load images
                 if: steps.check-label-tests-regenerate.outputs.SHOULD_RUN_TESTS_REGENERATE == 'true'
-                run: |
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/storefront-image.tar
-                    docker load --input ${{ runner.temp }}/elastic-image.tar
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Build application
                 if: steps.check-label-tests-regenerate.outputs.SHOULD_RUN_TESTS_REGENERATE == 'true'
                 run: |
@@ -648,20 +545,8 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: storefront-image.tar
-                    path: ${{ runner.temp }}
             -   name: Load images
-                run: |
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/storefront-image.tar
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Build application
                 run: docker compose up -d php-fpm storefront
             -   name: Check translations are dumped
@@ -706,26 +591,8 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: docker-compose
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: elastic-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: storefront-image.tar
-                    path: ${{ runner.temp }}
             -   name: Load images
-                run: |
-                    docker load --input ${{ runner.temp }}/storefront-image.tar
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/elastic-image.tar
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Build application
                 run: |
                     docker compose up -d
@@ -790,26 +657,8 @@ jobs:
                 with:
                     name: rabbitmq-vhost-sh
                     path: ${{ needs.variables.outputs.BRANCH_NAME }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: php-fpm-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: storefront-image.tar
-                    path: ${{ runner.temp }}
-            -   name: Download artifact
-                uses: actions/download-artifact@v4
-                with:
-                    name: elastic-image.tar
-                    path: ${{ runner.temp }}
             -   name: Load images
-                run: |
-                    docker load --input ${{ runner.temp }}/storefront-image.tar
-                    docker load --input ${{ runner.temp }}/php-fpm-image.tar
-                    docker load --input ${{ runner.temp }}/elastic-image.tar
+                uses: ./.github/workflows/load-built-images.yaml
             -   name: Move docker-compose.review.yml to branch folder
                 if: "contains(github.event.pull_request.labels.*.name, 'Use docker-compose defined services for review')"
                 run: |

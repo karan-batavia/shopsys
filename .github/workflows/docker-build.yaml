@@ -188,6 +188,10 @@ jobs:
         needs: build-php-fpm-image
         runs-on: ubuntu-22.04
         steps:
+            -   name: GIT checkout branch - ${{ github.ref }}
+                uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.ref }}
             -   name: Load images
                 uses: ./.github/actions/load-built-images
             -   name: Download docker-compose.yml from artifacts

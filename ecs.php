@@ -115,6 +115,7 @@ return ECSConfig::configure()
                 __DIR__ . '/packages/framework/src/Model/Blog/Article/Elasticsearch/BlogArticleElasticsearchDataFetcher.php',
                 __DIR__ . '/packages/framework/src/Model/Product/Elasticsearch/ProductExportRepository.php',
                 __DIR__ . '/packages/framework/src/Model/Product/Search/ProductElasticsearchConverter.php',
+                __DIR__ . '/packages/framework/src/Maker/EntityConfig/EntityFieldsConfigurator.php',
             ],
             DisallowMultipleAssignmentsSniff::class => [
                 __DIR__ . '/project-base/app/src/Kernel.php',
@@ -138,6 +139,7 @@ return ECSConfig::configure()
                 __DIR__ . '/packages/framework/src/Controller/Admin/PriceListController.php',
                 __DIR__ . '/packages/framework/src/Migrations/Version*.php',
                 __DIR__ . '/packages/framework/src/Form/Admin/*/*FormType.php',
+                __DIR__ . '/packages/framework/src/Maker/EntityConfig/EntityFieldsConfigurator.php',
                 __DIR__ . '/packages/framework/src/Model/AdminNavigation/SideMenuBuilder.php',
                 __DIR__ . '/packages/framework/src/Model/Mail/MailTemplateBuilder.php',
                 __DIR__ . '/packages/framework/src/Model/Mail/MailTemplateConfiguration.php',

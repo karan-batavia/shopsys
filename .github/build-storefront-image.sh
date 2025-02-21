@@ -7,5 +7,6 @@ docker image build \
     --target production \
     --no-cache \
     --compress \
+    --build-arg node_uid=1000
     -f project-base/storefront/docker/Dockerfile \
     ./project-base/storefront

@@ -14,14 +14,14 @@ export const FilterGroupTitle: FC<{ isOpen: boolean; title: string; onClick: () 
     isActive,
 }) => (
     <div
-        className="flex cursor-pointer items-center justify-between font-secondary font-semibold uppercase text-text"
+        className="font-secondary text-text flex cursor-pointer items-center justify-between font-semibold uppercase"
         onClick={onClick}
     >
         <div className="flex items-center gap-2.5">
             {title}
-            {isActive && <div className="ml- size-2 rounded-full bg-textSuccess vl:hidden" />}
+            {isActive && <div className="ml- bg-textSuccess vl:hidden size-2 rounded-full" />}
         </div>
-        <ArrowIcon className={twJoin('size-5 rotate-0 select-none text-xs transition', isOpen && 'rotate-180')} />
+        <ArrowIcon className={twJoin('size-5 rotate-0 text-xs transition select-none', isOpen && 'rotate-180')} />
     </div>
 );
 
@@ -44,7 +44,7 @@ export const FilterGroupContentItem: FC<{ isDisabled: boolean; keyName?: string 
 export const ShowAllButton: FC<{ onClick: () => void }> = ({ children, onClick }) => (
     <button
         className={twJoin(
-            'w-fit cursor-pointer border-none bg-none p-0 text-sm underline outline-none hover:bg-none hover:no-underline',
+            'w-fit cursor-pointer border-none bg-none p-0 text-sm underline outline-hidden hover:bg-none hover:no-underline',
             'text-link',
             'hover:text-linkHovered',
         )}
@@ -55,7 +55,7 @@ export const ShowAllButton: FC<{ onClick: () => void }> = ({ children, onClick }
 );
 
 export const SelectedParametersName: FC = ({ children }) => (
-    <p className="font-secondary text-xs font-semibold text-inputPlaceholder">{children}</p>
+    <p className="font-secondary text-inputPlaceholder text-xs font-semibold">{children}</p>
 );
 
 export const SelectedParametersList: FC<{ keyName?: string }> = ({ children, keyName }) => (
@@ -65,7 +65,7 @@ export const SelectedParametersList: FC<{ keyName?: string }> = ({ children, key
 );
 
 export const SelectedParametersListItem: FC<{ onClick: () => void }> = ({ children, onClick }) => (
-    <LabelLink className="group bg-backgroundAccentLess text-text last-of-type:mr-6" onClick={onClick}>
+    <LabelLink className="bg-backgroundAccentLess text-text group last-of-type:mr-6" onClick={onClick}>
         {children}
     </LabelLink>
 );

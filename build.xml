@@ -40,55 +40,21 @@
     </target>
 
     <target name="eslint-check" description="Find JS coding standard violations in all files using ESLint in the whole monorepo and print human readable output." hidden="true">
-        <phingcall target="shopsys_framework.eslint-check"/>
-        <exec executable="${path.eslint.executable}" passthru="true" checkreturn="true">
-            <arg value="--color"/>
-            <arg path="${path.framework.assets}"/>
-            <arg value="--config"/>
-            <arg path="${path.root}/.eslintrc.json"/>
-            <arg value="--ignore-path"/>
-            <arg path="${path.framework.assets}/.eslintignore"/>
+        <exec executable="${path.npm.executable}" logoutput="true" passthru="true" checkreturn="true">
+            <arg value="run"/>
+            <arg value="eslint"/>
+            <arg value="-ws"/>
+            <arg value="--if-present"/>
         </exec>
-        <exec executable="${path.eslint.executable}" passthru="true" checkreturn="true">
-            <arg value="--color"/>
-            <arg path="${path.administration.assets}"/>
-            <arg value="--config"/>
-            <arg path="${path.root}/.eslintrc.json"/>
-            <arg value="--ignore-path"/>
-            <arg path="${path.administration.assets}/.eslintignore"/>
-        </exec>
-    </target>
-
-    <target name="eslint-check-diff" hidden="true">
-        <echo level="info" message="Checking only changed files via 'eslint-check-diff' not supported in monorepo. Running 'eslint-check' instead..."/>
-        <phingcall target="eslint-check"/>
     </target>
 
     <target name="eslint-fix" description="Fix JS coding standard violations in all files using ESLint in the whole monorepo." hidden="true">
-        <phingcall target="shopsys_framework.eslint-fix"/>
-        <exec executable="${path.eslint.executable}" passthru="true" checkreturn="true">
-            <arg value="--color"/>
-            <arg value="--fix"/>
-            <arg path="${path.framework.assets}"/>
-            <arg value="--config"/>
-            <arg path="${path.root}/.eslintrc.json"/>
-            <arg value="--ignore-path"/>
-            <arg path="${path.framework.assets}/.eslintignore"/>
+        <exec executable="${path.npm.executable}" logoutput="true" passthru="true" checkreturn="true">
+            <arg value="run"/>
+            <arg value="eslint-fix"/>
+            <arg value="-ws"/>
+            <arg value="--if-present"/>
         </exec>
-        <exec executable="${path.eslint.executable}" passthru="true" checkreturn="true">
-            <arg value="--color"/>
-            <arg value="--fix"/>
-            <arg path="${path.administration.assets}"/>
-            <arg value="--config"/>
-            <arg path="${path.root}/.eslintrc.json"/>
-            <arg value="--ignore-path"/>
-            <arg path="${path.administration.assets}/.eslintignore"/>
-        </exec>
-    </target>
-
-    <target name="eslint-fix-diff" hidden="true">
-        <echo level="info" message="Fixing only changed files via 'eslint-fix-diff' not supported in monorepo. Running 'eslint-fix' instead..."/>
-        <phingcall target="eslint-fix"/>
     </target>
 
     <target name="frontend-api-generate-apiary-blueprint">

@@ -12,7 +12,9 @@
         "trans": "node ./assets/js/bin/trans.js",
         "trans:dump": "node ./assets/js/bin/transDump.js",
         "tests": "npm run tests:unit",
-        "tests:unit": "jest assets"
+        "tests:unit": "jest assets",
+        "eslint": "eslint --color ./assets --config .eslintrc.json --ignore-path .eslintignore",
+        "eslint-fix": "eslint --fix --color ./assets --config .eslintrc.json --ignore-path .eslintignore"
     },
     "preferGlobal": false,
     "devDependencies": {

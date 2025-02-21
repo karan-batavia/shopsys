@@ -5,7 +5,7 @@ import Register from '../../common/utils/Register';
 export default class AdvancedSearch {
 
     constructor ($addRuleButton, $rulesContainer, $ruleTemplate) {
-        $ruleTemplate.detach().removeClass('display-none').removeAttr('id').find('*[id]').removeAttr('id');
+        $ruleTemplate.detach().removeClass('d-none').removeAttr('id').find('*[id]').removeAttr('id');
         $ruleTemplate.find('select.select2-hidden-accessible').select2('destroy');
 
         let newRuleIndexCounter = 0;
@@ -49,6 +49,7 @@ export default class AdvancedSearch {
                 const $newRule = $($.parseHTML(data));
                 $rule.replaceWith($newRule);
 
+                // @todo register new content does not work for data- loaded elements (bootstrap popover, see order advanced search info icon)
                 (new Register()).registerNewContent($newRule);
             }
         });

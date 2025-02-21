@@ -59,15 +59,15 @@ Encore
 ;
 
 Encore
-    .addEntry('admin-style', './assets/styles/admin/main.less')
-    .addEntry('admin-wysiwyg', './assets/styles/admin/wysiwyg.less')
+    .addEntry('admin-style', './assets/styles/admin/main.scss')
     .addPlugin(
         new StylelintPlugin({
             configFile: '.stylelintrc',
-            files: 'assets/styles/**/*.less'
+            files: 'assets/styles/**/*.scss',
         })
     )
     .enableLessLoader()
+    .enableSassLoader()
     .enablePostCssLoader()
 ;
 

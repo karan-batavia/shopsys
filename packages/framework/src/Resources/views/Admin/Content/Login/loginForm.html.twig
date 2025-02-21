@@ -1,57 +1,56 @@
-{% extends '@ShopsysFramework/Admin/Layout/layoutBlank.html.twig' %}
+{% extends '@ShopsysAdministration/layout/layout_blank.html.twig' %}
 
 {% block title %}
     - {{ 'Login'|trans }}
 {% endblock %}
 
 {% block content %}
-
-    {{ form_start(form, {attr: {class: 'box-login'}}) }}
-        {{ form_errors(form) }}
-
-        <h1 class="box-login__heading">{{ 'Administration'|trans }}</h1>
+    <div class="container container-tight py-4">
 
         {% if error %}
-            <p class="in-message in-message--danger">{{ error }}</p>
+            <div class="alert alert-important alert-danger" role="alert">{{ error }}</div>
         {% endif %}
 
-        <div class="box-login__row">
-            <span class="box-login__error">
-                {{ form_errors(form.username) }}
-            </span>
-            {% set
-                usernameAttributes = {
-                    placeholder: 'Username'|trans,
-                    class: 'box-login__input',
-                    value: lastUsername
-                }
-            %}
-            {% if not lastUsername %}
-                {% set usernameAttributes = usernameAttributes|merge({'autofocus': 'autofocus'}) %}
-            {% endif %}
-            {{ form_widget(form.username, {attr: usernameAttributes}) }}
+        <div class="card card-md">
+            <div class="card-body">
+                <h2 class="h2 text-center mb-4">{{ 'Administration'|trans }}</h2>
+
+                {{ form_start(form) }}
+                {{ form_errors(form) }}
+
+                <div class="mb-3">
+                    {{ form_label((form.username)) }}
+
+                    {% set
+                        usernameAttributes = {
+                        value: lastUsername
+                    } %}
+                    {% if not lastUsername %}
+                        {% set usernameAttributes = usernameAttributes|merge({'autofocus': 'autofocus'}) %}
+                    {% endif %}
+
+                    {{ form_widget(form.username, {attr: usernameAttributes}) }}
+                </div>
+
+                <div class="mb-2">
+                    {{ form_label((form.password)) }}
+
+                    {% set
+                        passwordAttributes = {
+                        class: 'box-login__input',
+                    } %}
+                    {% if lastUsername %}
+                        {% set passwordAttributes = passwordAttributes|merge({'autofocus': 'autofocus'}) %}
+                    {% endif %}
+                    {{ form_widget(form.password, {attr: passwordAttributes}) }}
+                </div>
+
+                <div class="form-footer">
+                    {{ form_widget(form.login, {label: 'Log in'|trans, attr: {class: 'btn btn-primary w-100'}}) }}
+                </div>
+
+                {{ form_end(form) }}
+            </div>
         </div>
-
-        <div class="box-login__row">
-            <span class="box-login__error">
-                {{ form_errors(form.password) }}
-            </span>
-            {% set
-                passwordAttributes = {
-                    placeholder: 'Password'|trans,
-                    class: 'box-login__input',
-                }
-             %}
-            {% if lastUsername %}
-                {% set passwordAttributes = passwordAttributes|merge({'autofocus': 'autofocus'}) %}
-            {% endif %}
-            {{ form_widget(form.password, {attr: passwordAttributes}) }}
-        </div>
-
-        <div class="box-login__row box-login__row--btn">
-            {{ form_widget(form.login, {label: 'Log in'|trans, attr: {class: 'btn--block btn--large'}}) }}
-        </div>
-
-    {{ form_end(form) }}
-
+    </div>
 {% endblock %}

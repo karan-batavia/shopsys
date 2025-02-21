@@ -41,6 +41,7 @@ class BestsellingProductFormType extends AbstractType
             $builder->get('products')
                 ->add((string)$i, ProductType::class, [
                     'required' => false,
+                    'label' => $i+1,
                     'placeholder' => null,
                     'enableRemove' => true,
                 ]);

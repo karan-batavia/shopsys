@@ -1,4 +1,4 @@
-{% extends '@ShopsysFramework/Admin/Layout/layoutWithPanel.html.twig' %}
+{% extends '@ShopsysAdministration/layout/layout_with_panel.html.twig' %}
 
 {% set title = 'Extended SEO category %categoryName% - combinations'|trans({'%categoryName%': category.name(locale)}) %}
 
@@ -51,7 +51,7 @@
 
     </table>
 
-    {% embed '@ShopsysFramework/Admin/Inline/FixedBar/fixedBar.html.twig' %}
+    {% embed '@ShopsysAdministration/component/_fixed_bar.html.twig' %}
         {% block fixed_bar_content %}
             <a href="{{ backLink }}" class="btn-link-style">{{ 'Back to parameter selection'|trans }}</a>
         {% endblock %}

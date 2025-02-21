@@ -6,8 +6,10 @@ namespace Shopsys\FrameworkBundle\Form\Admin\Product;
 
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Shopsys\FormTypesBundle\ActionBarType;
+use Shopsys\AdministrationBundle\Form\ColumnGroupType;
+use Shopsys\AdministrationBundle\Form\RowGroupType;
+use Shopsys\AdministrationBundle\Form\SwitchType;
 use Shopsys\FormTypesBundle\MultidomainType;
-use Shopsys\FormTypesBundle\YesNoType;
 use Shopsys\FrameworkBundle\Component\Domain\Domain;
 use Shopsys\FrameworkBundle\Component\Plugin\PluginCrudExtensionFacade;
 use Shopsys\FrameworkBundle\Form\Admin\Product\Parameter\ProductParameterValueFormType;
@@ -110,7 +112,12 @@ final class ProductFormType extends AbstractType
             ];
         }
 
-        $builder
+        $rowName = $builder->create('rowName', RowGroupType::class);
+
+        $columnPrefix = $rowName->create('columnPrefix', ColumnGroupType::class, [
+            'row_attr' => ['class' => 'col-md-3'],
+        ]);
+        $columnPrefix
             ->add('namePrefix', LocalizedFullWidthType::class, [
                 'required' => false,
                 'entry_options' => [
@@ -120,7 +127,11 @@ final class ProductFormType extends AbstractType
                 ],
                 'label' => t('Name prefix'),
                 'render_form_row' => false,
-            ])
+            ]);
+        $rowName->add($columnPrefix);
+
+        $columnName = $rowName->create('columnName', ColumnGroupType::class);
+        $columnName
             ->add('name', LocalizedFullWidthType::class, [
                 'required' => false,
                 'entry_options' => [
@@ -132,7 +143,13 @@ final class ProductFormType extends AbstractType
                 ],
                 'label' => t('Name'),
                 'render_form_row' => false,
-            ])
+            ]);
+        $rowName->add($columnName);
+
+        $columnSuffix = $rowName->create('columnSuffix', ColumnGroupType::class, [
+            'row_attr' => ['class' => 'col-md-3'],
+        ]);
+        $columnSuffix
             ->add('nameSuffix', LocalizedFullWidthType::class, [
                 'required' => false,
                 'entry_options' => [
@@ -143,6 +160,9 @@ final class ProductFormType extends AbstractType
                 'label' => t('Name suffix'),
                 'render_form_row' => false,
             ]);
+        $rowName->add($columnSuffix);
+
+        $builder->add($rowName);
 
         if ($this->isProductVariant($product) || $this->isProductMainVariant($product)) {
             $builder->add($this->createVariantGroup($builder, $product));
@@ -420,7 +440,7 @@ final class ProductFormType extends AbstractType
         ]);
 
         $builderDisplayAvailabilityGroup
-            ->add('hidden', YesNoType::class, [
+            ->add('hidden', SwitchType::class, [
                 'required' => false,
                 'label' => t('Hide product'),
             ]);
@@ -428,7 +448,7 @@ final class ProductFormType extends AbstractType
         $builderDisplayAvailabilityGroup->add('domainHidden', MultidomainType::class, [
             'label' => t('Hide on domain'),
             'required' => false,
-            'entry_type' => YesNoType::class,
+            'entry_type' => SwitchType::class,
         ]);
 
         $builderDisplayAvailabilityGroup
@@ -442,7 +462,7 @@ final class ProductFormType extends AbstractType
                 'invalid_message' => 'Enter date in DD.MM.YYYY format',
                 'label' => t('Selling end date'),
             ])
-            ->add('sellingDenied', YesNoType::class, [
+            ->add('sellingDenied', SwitchType::class, [
                 'required' => false,
                 'label' => t('Exclude from sale on whole eshop'),
                 'attr' => [
@@ -455,7 +475,7 @@ final class ProductFormType extends AbstractType
             ->add('saleExclusion', MultidomainType::class, [
                 'label' => t('Exclude from sale on domains'),
                 'required' => false,
-                'entry_type' => YesNoType::class,
+                'entry_type' => SwitchType::class,
             ]);
 
         if (

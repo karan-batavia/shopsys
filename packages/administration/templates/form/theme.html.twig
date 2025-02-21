@@ -1,0 +1,71 @@
+{% extends 'bootstrap_5_layout.html.twig' %}
+
+{% use '@ShopsysAdministration/form/type/_groupType.html.twig' %}
+{% use '@ShopsysAdministration/form/type/_localizedType.html.twig' %}
+{% use '@ShopsysAdministration/form/type/_multidomainType.html.twig' %}
+{% use '@ShopsysAdministration/form/type/_productsType.html.twig' %}
+{% use '@ShopsysAdministration/form/type/_productType.html.twig' %}
+
+{%- block textarea_widget -%}
+    {% set attr = attr|merge({'data-bs-toggle': 'autosize'}) %}
+    {{- parent() -}}
+{%- endblock textarea_widget -%}
+
+{%- block form_help -%}
+    {%- if help is not empty -%}
+        <a tabindex="0" class="form-help"
+           data-bs-toggle="popover"
+           data-bs-placement="left"
+           data-bs-trigger="focus"
+           data-bs-html="{{ help_html ? 'true' : 'false' }}"
+           data-bs-content="{{- block('form_help_content') -}}">?</a>
+    {%- endif -%}
+{%- endblock form_help %}
+
+{% block form_help_content -%}
+    {%- if translation_domain is same as(false) -%}
+        {{- help -}}
+    {%- else -%}
+        {{- help|trans(help_translation_parameters, translation_domain) -}}
+    {%- endif -%}
+{%- endblock form_help_content %}
+
+{% block row_grosup_row %}
+    <div class="card p-2">
+        {% if label %}
+            <div class="card-title">
+                {{ label }}
+            </div>
+        {% endif %}
+        <div class="card-body">
+            {{ form_widget(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block column_group_row %}
+    <div class="{{ row_attr.class|default('col') }}">
+        <div class="card p-2">
+            {% if label %}
+                <div class="card-title">
+                    {{ label }}
+                </div>
+            {% endif %}
+            {{ form_widget(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block action_bar_row %}
+    {% embed '@ShopsysAdministration/component/_fixed_bar.html.twig' %}
+        {% block fixed_bar_content %}
+            {% for child in form %}
+                {{- form_widget(child) -}}
+            {% endfor %}
+        {% endblock %}
+    {% endembed %}
+{% endblock %}
+
+{% block link_widget %}
+    <a href="{{ link }}">{{ label }}</a>
+{% endblock %}

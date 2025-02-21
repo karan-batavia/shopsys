@@ -4,20 +4,24 @@
     {{ 'No product found.'|trans }}
 {% endblock %}
 
-{% block grid_action_cell_type_edit %}
-    <a
-        class="in-icon in-icon--edit table-action{% if actionColumn.classAttribute %} {{ actionColumn.classAttribute }}{% endif %}"
-        href="{{ actionColumn.targetUrl(row) }}"
-        title = "{{ actionColumn.title }}"
-    >{{ ux_icon('pencil') }}</a>
-{% endblock %}
-
 {% block grid_value_cell_id_name %}
     {% if row.variantType == VARIANT_TYPE_MAIN %}
-        <span class="in-letter cursor-help js-tooltip" title="{{ 'Main variant'|trans }}">{{ 'Main variant [abbreviation]'|trans }}</span>
+        <span class="cursor-help badge badge-pill bg-lime-lt"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title="{{ 'Main variant'|trans }}"
+        >
+            {{ 'Main variant [abbreviation]'|trans }}
+        </span>
     {% endif %}
     {% if row.variantType == VARIANT_TYPE_VARIANT %}
-        <span class="in-letter cursor-help js-tooltip" title="{{ 'Variant'|trans }}">{{ 'Variant [abbreviation]'|trans }}</span>
+        <span class="cursor-help badge badge-pill bg-cyan-lt"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title="{{ 'Variant'|trans }}"
+        >
+            {{ 'Variant [abbreviation]'|trans }}
+        </span>
     {% endif %}
     <a href="{{ url('admin_product_edit', { id: row.id }) }}">{{ row.name|productListDisplayNameByName }}</a>
 {% endblock %}

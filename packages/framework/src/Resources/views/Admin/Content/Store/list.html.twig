@@ -1,4 +1,4 @@
-{% extends '@ShopsysFramework/Admin/Layout/layoutWithPanel.html.twig' %}
+{% extends '@ShopsysAdministration/layout/layout_with_panel.html.twig' %}
 
 {% block title %}- {{ 'Store list'|trans }}{% endblock %}
 {% block h1 %}{{ 'Store list'|trans }}{% endblock %}
@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    {% embed '@ShopsysFramework/Admin/Inline/FixedBar/fixedBar.html.twig' %}
+    {% embed '@ShopsysAdministration/component/_fixed_bar.html.twig' %}
         {% block fixed_bar_content %}
             <button class="js-drag-and-drop-grid-submit-all btn btn--disabled" type="button">{{ 'Save changes in order'|trans }}</button>
         {% endblock %}

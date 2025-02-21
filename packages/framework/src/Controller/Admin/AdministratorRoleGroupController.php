@@ -54,7 +54,7 @@ class AdministratorRoleGroupController extends AdminBaseController
         $grid->addDeleteActionColumn('admin_administratorrolegroup_delete', ['id' => 'arg.id'])
             ->setConfirmMessage(t('Do you really want to remove this administrator role group?'));
 
-        return $this->render('@ShopsysFramework/Admin/Content/Administrator/RoleGroup/list.html.twig', [
+        return $this->render('@ShopsysAdministration/content/administrator/role_group/list.html.twig', [
             'gridView' => $grid->createView(),
         ]);
     }
@@ -97,7 +97,7 @@ class AdministratorRoleGroupController extends AdminBaseController
             $this->addErrorFlash(t('Please check the correctness of all data filled.'));
         }
 
-        return $this->render('@ShopsysFramework/Admin/Content/Administrator/RoleGroup/new.html.twig', [
+        return $this->render('@ShopsysAdministration/content/administrator/role_group/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }
@@ -150,7 +150,7 @@ class AdministratorRoleGroupController extends AdminBaseController
             t('Editing administrator role group - %name%', ['%name%' => $administratorRoleGroup->getName()]),
         );
 
-        return $this->render('@ShopsysFramework/Admin/Content/Administrator/RoleGroup/edit.html.twig', [
+        return $this->render('@ShopsysAdministration/content/administrator/role_group/edit.html.twig', [
             'form' => $form->createView(),
             'administratorRoleGroup' => $administratorRoleGroup,
         ]);
@@ -176,7 +176,7 @@ class AdministratorRoleGroupController extends AdminBaseController
 
             $this->breadcrumbOverrider->overrideLastItem(t('New administrator role group'));
 
-            return $this->render('@ShopsysFramework/Admin/Content/Administrator/RoleGroup/new.html.twig', [
+            return $this->render('@ShopsysAdministration/content/administrator/role_group/new.html.twig', [
                 'form' => $form->createView(),
             ]);
         } catch (AdministratorRoleGroupNotFoundException $ex) {

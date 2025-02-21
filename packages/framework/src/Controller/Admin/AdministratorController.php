@@ -76,6 +76,7 @@ class AdministratorController extends AdminBaseController
         $grid->setDefaultOrder('realName');
 
         $grid->addColumn('realName', 'a.realName', t('Full name'), true);
+        $grid->addColumn('userName', 'a.username', t('Username'), true);
         $grid->addColumn('email', 'a.email', t('Email'));
 
         $grid->setActionColumnClassAttribute('table-col table-col-10');
@@ -83,9 +84,9 @@ class AdministratorController extends AdminBaseController
         $grid->addDeleteActionColumn('admin_administrator_delete', ['id' => 'a.id'])
             ->setConfirmMessage(t('Do you really want to remove this administrator?'));
 
-        $grid->setTheme('@ShopsysFramework/Admin/Content/Administrator/listGrid.html.twig');
+        $grid->setTheme('@ShopsysAdministration/content/administrator/list_grid.html.twig');
 
-        return $this->render('@ShopsysFramework/Admin/Content/Administrator/list.html.twig', [
+        return $this->render('@ShopsysAdministration/content/administrator/list.html.twig', [
             'gridView' => $grid->createView(),
         ]);
     }
@@ -158,7 +159,7 @@ class AdministratorController extends AdminBaseController
             static::MAX_ADMINISTRATOR_ACTIVITIES_COUNT,
         );
 
-        return $this->render('@ShopsysFramework/Admin/Content/Administrator/edit.html.twig', [
+        return $this->render('@ShopsysAdministration/content/administrator/edit.html.twig', [
             'form' => $form->createView(),
             'administrator' => $administrator,
             'lastAdminActivities' => $lastAdminActivities,
@@ -345,7 +346,7 @@ class AdministratorController extends AdminBaseController
             }
         }
 
-        return $this->render('@ShopsysFramework/Admin/Content/Administrator/enableTwoFactorAuthenticationByEmail.html.twig', [
+        return $this->render('@ShopsysAdministration/content/administrator/enable_two_factor_authentication_by_email.html.twig', [
             'formVerification' => $formVerification->createView(),
             'formSendEmail' => $formSendEmail->createView(),
         ]);
@@ -375,7 +376,7 @@ class AdministratorController extends AdminBaseController
         }
         $qrCodeDataUri = $this->administratorTwoFactorAuthenticationFacade->getQrCodeDataUri($administrator);
 
-        return $this->render('@ShopsysFramework/Admin/Content/Administrator/enableTwoFactorAuthenticationByGoogleAuth.html.twig', [
+        return $this->render('@ShopsysAdministration/content/administrator/enable_two_factor_authentication_by_google_auth.html.twig', [
             'form' => $form->createView(),
             'qrCodeDataUri' => $qrCodeDataUri,
             'googleAuthenticatorSecret' => $administrator->getGoogleAuthenticatorSecret(),
@@ -452,7 +453,7 @@ class AdministratorController extends AdminBaseController
             }
         }
 
-        return $this->render('@ShopsysFramework/Admin/Content/Administrator/disableTwoFactorAuthentication.html.twig', [
+        return $this->render('@ShopsysAdministration/content/administrator/disable_two_factor_authentication.html.twig', [
             'formVerification' => $formVerification->createView(),
             'formSendEmail' => $formSendEmail->createView(),
             'administrator' => $administrator,
@@ -538,13 +539,13 @@ class AdministratorController extends AdminBaseController
     #[Route(path: '/administrator/set-new-password/', name: 'admin_administrator_set-new-password')]
     public function setNewPasswordAction(Request $request): Response
     {
-        $email = $request->query->get('email');
-        $hash = $request->query->get('hash');
+        $email = $request->query->get('email', '');
+        $hash = $request->query->get('hash', '');
 
         $administrator = $this->administratorFacade->getByEmail($email);
 
         if (!$administrator->isResetPasswordHashValid($hash)) {
-            return $this->render('@ShopsysFramework/Admin/Content/Administrator/invalidResetPasswordHash.html.twig');
+            return $this->render('@ShopsysAdministration/content/administrator/invalid_reset_password_hash.html.twig');
         }
 
         $administratorData = $this->administratorDataFactory->createFromAdministrator($administrator);
@@ -575,7 +576,7 @@ class AdministratorController extends AdminBaseController
             $this->addErrorFlash(t('Please check the correctness of all data filled.'));
         }
 
-        return $this->render('@ShopsysFramework/Admin/Content/Administrator/resetPassword.html.twig', [
+        return $this->render('@ShopsysAdministration/content/administrator/reset_password.html.twig', [
             'form' => $form,
         ]);
     }

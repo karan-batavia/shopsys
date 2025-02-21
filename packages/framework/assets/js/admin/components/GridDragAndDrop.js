@@ -3,9 +3,9 @@ import 'jquery-ui/ui/widgets/mouse';
 import 'jquery-ui-touch-punch';
 import formChangeInfo from './FormChangeInfo';
 import Ajax from '../../common/utils/Ajax';
-import Window from '../utils/Window';
 import Register from '../../common/utils/Register';
 import Translator from 'bazinga-translator';
+import ModalWindow from '../utils/ModalWindow';
 
 export default class GridDragAndDrop {
 
@@ -100,7 +100,7 @@ export default class GridDragAndDrop {
                 _this.highlightChanges($grid, false);
 
                 // eslint-disable-next-line no-new
-                new Window({
+                new ModalWindow({
                     content: Translator.trans('Order saved')
                 });
             }

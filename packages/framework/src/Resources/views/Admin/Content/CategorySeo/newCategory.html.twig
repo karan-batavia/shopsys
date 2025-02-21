@@ -1,4 +1,4 @@
-{% extends '@ShopsysFramework/Admin/Layout/layoutWithPanel.html.twig' %}
+{% extends '@ShopsysAdministration/layout/layout_with_panel.html.twig' %}
 {% import _self as self %}
 
 {% block title %}- {{ 'Extended SEO category - category selection'|trans }}{% endblock %}
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    {% embed '@ShopsysFramework/Admin/Inline/FixedBar/fixedBar.html.twig' %}
+    {% embed '@ShopsysAdministration/component/_fixed_bar.html.twig' %}
         {% block fixed_bar_content %}
             <a href="{{ url('admin_categoryseo_list') }}" class="btn-link-style">{{ 'Back to overview'|trans }}</a>
         {% endblock %}

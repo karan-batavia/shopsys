@@ -93,7 +93,7 @@ class CustomerController extends AdminBaseController
             $this->customerUserFacade->editByAdmin($customerUser->getId(), $customerUserUpdateData);
 
             $this->addSuccessFlashTwig(
-                t('Customer <strong><a href="{{ url }}">{{ name }}</a></strong> modified'),
+                t('Customer <strong><a class="alert-link" href="{{ url }}">{{ name }}</a></strong> modified'),
                 [
                     'name' => $customerUser->getFullName(),
                     'url' => $this->generateUrl('admin_customer_edit', ['id' => $customerUser->getId()]),

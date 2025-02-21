@@ -1,4 +1,4 @@
-{% extends '@ShopsysFramework/Admin/Layout/layoutWithPanel.html.twig' %}
+{% extends '@ShopsysAdministration/layout/layout_with_panel.html.twig' %}
 
 {% block title %}- {{ 'Dashboard'|trans }}{% endblock %}
 {% block h1 %}{{ 'Dashboard'|trans }}{% endblock %}
@@ -16,7 +16,10 @@
     <div class="transfers">
         <h2 class="margin-top-15">{{ 'Transfers'|trans }}</h2>
 
-        <a href="{{ url('admin_transferissue_list') }}" class="btn">{{ 'Transfer issues overview'|trans }} ({{ transferIssuesCount }})</a>
+        <a href="{{ url('admin_transferissue_list') }}" class="btn position-relative">{{ 'Transfer issues overview'|trans }}
+            {% set badgeColor = transferIssuesCount > 0 ? 'red' : 'green' %}
+            <span class="badge bg-{{ badgeColor }} text-{{ badgeColor }}-fg badge-notification badge-pill">{{ transferIssuesCount }}</span>
+        </a>
     </div>
 
     <div class="clearfix">

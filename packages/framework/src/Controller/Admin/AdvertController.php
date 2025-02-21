@@ -90,7 +90,7 @@ class AdvertController extends AdminBaseController
             t('Editing advertising - %name%', ['%name%' => $advert->getName()]),
         );
 
-        return $this->render('@ShopsysFramework/Admin/Content/Advert/edit.html.twig', [
+        return $this->render('@ShopsysAdministration/content/advert/edit.html.twig', [
             'form' => $form->createView(),
             'advert' => $advert,
         ]);
@@ -122,7 +122,7 @@ class AdvertController extends AdminBaseController
         $grid->enablePaging();
         $grid->setDefaultOrder('name');
 
-        $grid->addColumn('visible', 'a.hidden', t('Visibility'), true)->setClassAttribute('table-col table-col-10');
+        $grid->addColumn('visible', 'a.hidden', t('Visibility'), true)->setClassAttribute('w-1 text-center');
         $grid->addColumn('name', 'a.name', t('Name'), true);
         $grid->addColumn('preview', 'a.id', t('Preview'), false);
         $grid->addColumn('positionName', 'a.positionName', t('Area'), true);
@@ -132,14 +132,14 @@ class AdvertController extends AdminBaseController
         $grid->addDeleteActionColumn('admin_advert_delete', ['id' => 'a.id'])
             ->setConfirmMessage(t('Do you really want to remove this advert?'));
 
-        $grid->setTheme('@ShopsysFramework/Admin/Content/Advert/listGrid.html.twig', [
+        $grid->setTheme('@ShopsysAdministration/content/advert/list_grid.html.twig', [
             'advertPositionNames' => $this->advertPositionRegistry->getAllLabelsIndexedByNames(),
             'TYPE_IMAGE' => Advert::TYPE_IMAGE,
         ]);
 
         $this->administratorGridFacade->restoreAndRememberGridLimit($this->getCurrentAdministrator(), $grid);
 
-        return $this->render('@ShopsysFramework/Admin/Content/Advert/list.html.twig', [
+        return $this->render('@ShopsysAdministration/content/advert/list.html.twig', [
             'gridView' => $grid->createView(),
         ]);
     }
@@ -181,7 +181,7 @@ class AdvertController extends AdminBaseController
             $this->addErrorFlashTwig(t('Please check the correctness of all data filled.'));
         }
 
-        return $this->render('@ShopsysFramework/Admin/Content/Advert/new.html.twig', [
+        return $this->render('@ShopsysAdministration/content/advert/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }

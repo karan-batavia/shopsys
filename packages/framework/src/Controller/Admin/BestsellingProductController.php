@@ -45,7 +45,7 @@ class BestsellingProductController extends AdminBaseController
             $domainId,
         );
 
-        return $this->render('@ShopsysFramework/Admin/Content/BestsellingProduct/list.html.twig', [
+        return $this->render('@ShopsysAdministration/content/bestselling_product/list.html.twig', [
             'categoriesWithPreloadedChildren' => $categoriesWithPreloadedChildren,
             'selectedDomainId' => $domainId,
             'bestsellingProductsInCategories' => $bestsellingProductsInCategories,
@@ -97,7 +97,7 @@ class BestsellingProductController extends AdminBaseController
 
         $this->breadcrumbOverrider->overrideLastItem($category->getName());
 
-        return $this->render('@ShopsysFramework/Admin/Content/BestsellingProduct/detail.html.twig', [
+        return $this->render('@ShopsysAdministration/content/bestselling_product/detail.html.twig', [
             'form' => $form->createView(),
             'categoryName' => $category->getName(),
         ]);

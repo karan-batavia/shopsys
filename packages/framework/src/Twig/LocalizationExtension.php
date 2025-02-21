@@ -31,7 +31,16 @@ class LocalizationExtension extends AbstractExtension
         return [
             new TwigFunction('localeFlag', $this->getLocaleFlagHtml(...), ['is_safe' => ['html']]),
             new TwigFunction('languageName', $this->getTitle(...), ['is_safe' => ['html']]),
+            new TwigFunction('allowedAdminLocales', $this->getAllowedAdminLocales(...), ['is_safe' => ['html']]),
         ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllowedAdminLocales(): array
+    {
+        return $this->localization->getAllowedAdminLocales();
     }
 
     /**

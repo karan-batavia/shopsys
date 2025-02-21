@@ -1,4 +1,4 @@
-{% extends '@ShopsysFramework/Admin/Layout/layoutWithPanel.html.twig' %}
+{% extends '@ShopsysAdministration/layout/layout_with_panel.html.twig' %}
 
 {% block title %}- {{ 'Watchdog - '|trans }} {{ product|productDisplayName }}{% endblock %}
 {% block h1 %}{{ 'Watchdog - '|trans }} {{ product|productDisplayName }}{% endblock %}
@@ -28,7 +28,7 @@
 
     {{ gridView.render() }}
 
-    {% embed '@ShopsysFramework/Admin/Inline/FixedBar/fixedBar.html.twig' %}
+    {% embed '@ShopsysAdministration/component/_fixed_bar.html.twig' %}
         {% block fixed_bar_content %}
             <a href="{{ url('admin_watchdog_list') }}" class="btn-link-style">{{ 'Back to overview'|trans }}</a>
         {% endblock %}

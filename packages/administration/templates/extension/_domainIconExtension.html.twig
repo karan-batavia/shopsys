@@ -1,0 +1,7 @@
+{% if iconSrc is same as(null) %}
+    {% set colors = ['lime', 'blue', 'teal', 'red', 'cyan', 'yellow', 'pink', 'green', 'indigo', 'purple', 'orange', 'azure'] %}
+    {% set index = (domainId-1) % colors|length %}
+    <span class="badge badge-pill bg-{{ colors[index] }}-lt" title="{{ domainName }}" style="width: 46px;">{{ domainId }}</span>
+{% else %}
+    <img width="46" height="26" src="{{ iconSrc }}" alt="{{ domainId }}" title="{{ domainName }}">
+{% endif %}

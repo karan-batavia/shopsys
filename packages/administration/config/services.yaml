@@ -8,3 +8,8 @@ services:
         exclude:
             - '../src/DependencyInjection/'
         resource: '../src/'
+
+    Shopsys\AdministrationBundle\Twig\Runtime\DomainIconRuntime:
+        arguments:
+            - '%kernel.project_dir%'
+        tags: ['twig.runtime']

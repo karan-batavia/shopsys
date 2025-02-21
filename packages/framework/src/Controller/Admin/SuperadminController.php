@@ -7,6 +7,7 @@ namespace Shopsys\FrameworkBundle\Controller\Admin;
 use Shopsys\FrameworkBundle\Component\Domain\AdminDomainTabsFacade;
 use Shopsys\FrameworkBundle\Component\Router\LocalizedRouterFactory;
 use Shopsys\FrameworkBundle\Form\Admin\Module\ModulesFormType;
+use Shopsys\FrameworkBundle\Form\Admin\Styleguide\StyleguideFormType;
 use Shopsys\FrameworkBundle\Form\Admin\Superadmin\InputPriceTypeFormType;
 use Shopsys\FrameworkBundle\Form\Admin\Superadmin\MailWhitelistFormType;
 use Shopsys\FrameworkBundle\Model\Localization\Localization;
@@ -130,6 +131,21 @@ class SuperadminController extends AdminBaseController
     public function cssDocumentationAction()
     {
         return $this->render('@ShopsysFramework/Admin/Content/Superadmin/cssDocumentation.html.twig');
+    }
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    #[Route(path: '/superadmin/styleguide/')]
+    public function styleguideAction(Request $request): Response
+    {
+        $form = $this->createForm(StyleguideFormType::class);
+        $form->handleRequest($request);
+
+        return $this->render('@ShopsysFramework/Admin/Content/Superadmin/styleguide.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     /**

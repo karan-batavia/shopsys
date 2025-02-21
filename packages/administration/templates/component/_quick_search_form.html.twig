@@ -1,0 +1,20 @@
+{#
+@var form_input: FormTypeInterface
+@var form_submit: FormTypeInterface
+@var info_message: string
+@var placeholder: string
+#}
+<div class="card mb-3">
+    <div class="card-body">
+        <h2 class="card-title">
+            {{ 'Quick search'|trans }}
+        </h2>
+        <div class="input-group input-group-flat">
+            {{ form_widget(form_input) }}
+            <span class="input-group-text">
+            {{ info_icon(info_message) }}
+        </span>
+            {{ form_widget(form_submit, { label: 'Search [verb]'|trans, attr: { class: 'btn'}, full_name: '' }) }}
+        </div>
+    </div>
+</div>

@@ -15,15 +15,18 @@
     {{ render(controller('Shopsys\\FrameworkBundle\\Controller\\Admin\\DomainFilterController::domainFilterTabsAction', { namespace: domainFilterNamespace })) }}
 
     {{ form_start(quickSearchForm) }}
-        {% embed '@ShopsysAdministration/component/_quick_search_form.html.twig' with {
-            form: quickSearchForm,
-            info_message: 'Searching searches in name. It is possible to use wildcards * and ?.'|trans
+        {% include '@ShopsysAdministration/component/_quick_search_form.html.twig' with {
+            form_input: quickSearchForm.text,
+            form_submit: quickSearchForm.submit,
+            info_message: 'Searching searches in name. It is possible to use wildcards * and ?.'|trans,
+            placeholder: 'Search by name...'|trans
         } %}
     {{ form_end(quickSearchForm) }}
 
     {{ gridView.render() }}
 {% endblock %}
 
+{#
 
 <div class="wrap-divider wrap-divider--bottom">
     <div class="form-inline">
@@ -40,3 +43,4 @@
         </div>
     </div>
 </div>
+#}

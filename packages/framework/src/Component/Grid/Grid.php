@@ -84,7 +84,7 @@ class Grid
 
     protected bool $multipleDragAndDrop = false;
 
-    protected string $title;
+    protected ?string $title = null;
 
     /**
      * @param string $id
@@ -745,9 +745,9 @@ class Grid
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }

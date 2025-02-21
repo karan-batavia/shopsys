@@ -19,6 +19,7 @@ runs:
                 name: elastic-image.tar
                 path: ${{ runner.temp }}
         -   name: Load images
+            shell: bash
             run: |
                 docker load --input ${{ runner.temp }}/storefront-image.tar
                 docker load --input ${{ runner.temp }}/php-fpm-image.tar

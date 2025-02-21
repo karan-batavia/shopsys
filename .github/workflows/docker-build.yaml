@@ -186,7 +186,7 @@ jobs:
         runs-on: ubuntu-22.04
         steps:
             -   name: Load images
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Download docker-compose.yml from artifacts
                 uses: actions/download-artifact@v4
                 with:
@@ -213,7 +213,7 @@ jobs:
                 with:
                     name: docker-compose
             -   name: Load images
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Build application
                 run: docker compose up -d --wait storefront php-fpm
             -   name: Move schema.graphql to Storefront container
@@ -253,7 +253,7 @@ jobs:
                 with:
                     name: docker-compose
             -   name: Load images
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Build application
                 run: docker compose up -d --wait storefront
             -   name: Run unit tests
@@ -275,7 +275,7 @@ jobs:
                 with:
                     name: docker-compose
             -   name: Load images
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Build application
                 run: |
                     docker compose up -d postgres webserver elasticsearch redis php-fpm
@@ -308,7 +308,7 @@ jobs:
                 with:
                     name: docker-compose
             -   name: Load images
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Build application
                 run: |
                     docker compose up -d postgres webserver elasticsearch redis php-fpm
@@ -337,7 +337,7 @@ jobs:
                 with:
                     name: docker-compose
             -   name: Load images
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Build application
                 run: |
                     docker compose up -d webserver postgres elasticsearch redis php-fpm selenium-server
@@ -391,7 +391,7 @@ jobs:
                     name: docker-compose-cypress
             -   name: Load images
                 if: env.SHOULD_RUN_TESTS == 'true'
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Build application
                 if: env.SHOULD_RUN_TESTS == 'true'
                 run: |
@@ -471,7 +471,7 @@ jobs:
                     name: docker-compose-cypress
             -   name: Load images
                 if: steps.check-label-tests-regenerate.outputs.SHOULD_RUN_TESTS_REGENERATE == 'true'
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Build application
                 if: steps.check-label-tests-regenerate.outputs.SHOULD_RUN_TESTS_REGENERATE == 'true'
                 run: |
@@ -546,7 +546,7 @@ jobs:
                 with:
                     name: docker-compose
             -   name: Load images
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Build application
                 run: docker compose up -d php-fpm storefront
             -   name: Check translations are dumped
@@ -592,7 +592,7 @@ jobs:
                 with:
                     name: docker-compose
             -   name: Load images
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Build application
                 run: |
                     docker compose up -d
@@ -658,7 +658,7 @@ jobs:
                     name: rabbitmq-vhost-sh
                     path: ${{ needs.variables.outputs.BRANCH_NAME }}
             -   name: Load images
-                uses: ./.github/workflows/load-built-images.yaml
+                uses: ./.github/actions/load-built-images
             -   name: Move docker-compose.review.yml to branch folder
                 if: "contains(github.event.pull_request.labels.*.name, 'Use docker-compose defined services for review')"
                 run: |

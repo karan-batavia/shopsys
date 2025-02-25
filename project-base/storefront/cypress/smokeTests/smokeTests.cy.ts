@@ -157,7 +157,7 @@ context('Smoke tests', () => {
             },
         },
 
-        // // dynamic routes
+        // dynamic routes
         ['/abandoned-cart/:cartUuid']: { skip: true },
         ['/articles/:articleSlug']: { skip: true },
         ['/blogArticles/:blogArticleSlug']: { skip: true },

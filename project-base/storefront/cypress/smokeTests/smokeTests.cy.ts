@@ -30,7 +30,7 @@ context('Smoke tests', () => {
                 checktHeadlineText('Change password');
             },
         },
-        ['/customer/complaint-detail']: { skip: true },
+        ['/customer/complaint-detail']: { skip: true }, // TODO add test
         ['/customer/complaints']: {
             skip: false,
             logged: true,
@@ -52,7 +52,7 @@ context('Smoke tests', () => {
                 checktHeadlineText('New complaint');
             },
         },
-        ['/customer/order-detail']: { skip: true },
+        ['/customer/order-detail']: { skip: true }, // TODO add test
         ['/customer/orders']: {
             skip: false,
             logged: true,
@@ -61,9 +61,9 @@ context('Smoke tests', () => {
             },
         },
         ['/customer/users']: { skip: true },
-        ['/order/contact-information']: { skip: true }, // TODO add test
-        ['/order/payment-status-notify']: { skip: true }, // TODO add test
-        ['/order/transport-and-payment']: { skip: true }, // TODO add test
+        ['/order/contact-information']: { skip: true },
+        ['/order/payment-status-notify']: { skip: true },
+        ['/order/transport-and-payment']: { skip: true },
         ['/order-detail/:urlHash']: { skip: true },
         ['/brands-overview']: {
             skip: false,
@@ -71,7 +71,7 @@ context('Smoke tests', () => {
                 cy.getByTID([[TIDs.blocks_simplenavigation_, 0]]).should('be.visible');
             },
         },
-        ['/cart']: { skip: true }, // TODO add test
+        ['/cart']: { skip: true },
         ['/contact-form']: {
             skip: false,
             test: () => {
@@ -96,9 +96,9 @@ context('Smoke tests', () => {
                 cy.getByTID([TIDs.login_form_submit_button]).should('be.visible');
             },
         },
-        ['/new-password']: { skip: true }, // TODO add test
-        ['/order-confirmation']: { skip: true }, // TODO add test
-        ['/order-payment-confirmation']: { skip: true }, // TODO add test
+        ['/new-password']: { skip: true },
+        ['/order-confirmation']: { skip: true },
+        ['/order-payment-confirmation']: { skip: true },
         ['/personal-data-export']: {
             skip: false,
             test: () => {
@@ -232,18 +232,30 @@ context('Smoke tests', () => {
 
     routesToCheck.forEach((routeName) => {
         const testConfig = filteredRoutes[routeName];
+
+        if (!testConfig) {
+            it(`💨 Smoke test - ${routeName}`, () => {
+                cy.wrap(null).then(() => {
+                    throw new Error(
+                        `❗ Missing smoke test configuration for route: ${routeName}. Please add a definition to the filteredRoutes object.`,
+                    );
+                });
+            });
+            return;
+        }
+
         const checkRouteCyFn = testConfig?.skip ? it.skip : it;
 
         checkRouteCyFn(`💨 Smoke test - ${routeName}`, () => {
             const isCustomRoute = routeName in filteredRoutes;
 
-            if (isCustomRoute && filteredRoutes[routeName].logged) {
+            if (isCustomRoute && filteredRoutes[routeName]?.logged) {
                 cy.login(user.email, user.password);
             }
 
             let routeToRequest = (translatedRoutes[routeName as keyof typeof translatedRoutes] ?? routeName) as string;
 
-            const customParameters = filteredRoutes[routeName].params;
+            const customParameters = isCustomRoute ? filteredRoutes[routeName]?.params : undefined;
 
             if (isCustomRoute && customParameters) {
                 Object.keys(customParameters).forEach((parameterKey) => {
@@ -256,13 +268,94 @@ context('Smoke tests', () => {
                 });
             }
 
-            cy.visit({ url: routeToRequest, failOnStatusCode: true }).then(() => {
+            const consoleErrors: string[] = [];
+            const jsErrors: string[] = [];
+
+            // handle uncaught exceptions without failing the test immediately
+            cy.on('uncaught:exception', (err) => {
+                jsErrors.push(`🔺 Uncaught exception: ${err.message}\n${err.stack || ''}`);
+                return false; // prevent the test from failing immediately
+            });
+
+            cy.visit({
+                url: routeToRequest,
+                failOnStatusCode: true,
+                onBeforeLoad(win) {
+                    // intercept console.error
+                    const originalConsoleError = win.console.error;
+                    win.console.error = (...args) => {
+                        // log the error so we can still see it in test output
+                        originalConsoleError.apply(win.console, args);
+                        consoleErrors.push(args.join(' '));
+                    };
+
+                    // intercept unhandled errors
+                    win.addEventListener('error', (e) => {
+                        jsErrors.push(
+                            `🔻 Unhandled error: ${e.message || '❓ Unknown error'}\n${e.error?.stack || ''}`,
+                        );
+                    });
+                },
+            }).then(() => {
                 cy.get('#__NEXT_DATA__').should('exist');
                 cy.getByTID([TIDs.error_page]).should('not.exist');
 
-                if (isCustomRoute && filteredRoutes[routeName].test) {
-                    filteredRoutes[routeName].test?.();
-                }
+                // wait to ensure errors have time to occur
+                cy.wait(2000);
+
+                cy.document().then((doc) => {
+                    const bodyContent = doc.body.innerText.trim();
+                    let errorMessage = '';
+
+                    // for regular pages, we expect no errors
+                    try {
+                        expect(bodyContent.length, '❌ Page should not be blank').to.be.above(0);
+
+                        if (jsErrors.length > 0 || consoleErrors.length > 0) {
+                            errorMessage += `JavaScript errors:\n\n`;
+
+                            if (jsErrors.length > 0) {
+                                jsErrors.forEach((err, i) => {
+                                    errorMessage += `🟥 ${i + 1}. ${err}\n\n`;
+                                });
+                            }
+
+                            if (consoleErrors.length > 0) {
+                                consoleErrors.forEach((err, i) => {
+                                    errorMessage += `🔴 ${i + 1}. ${err}\n\n`;
+                                });
+                            }
+
+                            assert.fail(errorMessage);
+                        }
+                    } catch (err) {
+                        // if the page is blank and we have JS errors, provide a simple error message
+                        if (bodyContent.length === 0 && (jsErrors.length > 0 || consoleErrors.length > 0)) {
+                            let errorMessage = `Blank page with JavaScript errors:\n\n`;
+
+                            if (jsErrors.length > 0) {
+                                jsErrors.forEach((err, i) => {
+                                    errorMessage += `🟥 ${i + 1}. ${err}\n\n`;
+                                });
+                            }
+
+                            if (consoleErrors.length > 0) {
+                                consoleErrors.forEach((err, i) => {
+                                    errorMessage += `🔴 ${i + 1}. ${err}\n\n`;
+                                });
+                            }
+
+                            assert.fail(errorMessage);
+                        } else {
+                            // if it's just a blank page without JS errors, rethrow the original error
+                            throw err;
+                        }
+                    }
+
+                    if (isCustomRoute && filteredRoutes[routeName]?.test) {
+                        filteredRoutes[routeName].test?.();
+                    }
+                });
             });
         });
     });
